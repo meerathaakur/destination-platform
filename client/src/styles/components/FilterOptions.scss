@@ -1,0 +1,129 @@
+@use "../variable.scss" as *;
+@use "sass:color";
+
+.filter-options {
+    background: $secondary-color;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 350px;
+    font-family: 'Arial', sans-serif;
+
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid $border-color;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: $text-color;
+        }
+
+        .clear-filters {
+            background: none;
+            border: none;
+            color: $primary-color;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color $transition-speed;
+
+            &:hover {
+                color: color.adjust($primary-color, $lightness: -10%);
+            }
+        }
+    }
+
+    .filter-section {
+        border-bottom: 1px solid $border-color;
+        padding: 10px 0;
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+
+            h4 {
+                font-size: 1rem;
+                font-weight: bold;
+                color: $text-color;
+            }
+
+            .toggle-icon {
+                font-size: 1.2rem;
+                color: $primary-color;
+            }
+        }
+
+        .section-content {
+            margin-top: 8px;
+        }
+    }
+
+    // Range Slider
+    input[type='range'] {
+        width: 100%;
+        margin: 8px 0;
+        cursor: pointer;
+    }
+
+    .slider-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        color: $text-color;
+    }
+
+    // Budget & Interest Checkbox
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background $transition-speed;
+
+        input {
+            cursor: pointer;
+        }
+
+        &:hover {
+            background: $hover-color;
+            border-radius: 4px;
+        }
+    }
+
+    // Interests Grid
+    .interests-grid,
+    .seasons-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .interest-pill,
+    .season-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 16px;
+        font-size: 0.9rem;
+        background: $hover-color;
+        cursor: pointer;
+        transition: background $transition-speed, color $transition-speed;
+
+        &:hover {
+            background-color: color.adjust($primary-color, $lightness: 40%);
+        }
+
+        &.selected {
+            background: $selected-bg;
+            color: $selected-text;
+        }
+    }
+}

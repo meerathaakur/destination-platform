@@ -1,0 +1,110 @@
+@use "sass:color";
+@use "../variable.scss" as *;
+
+.home-page {
+    .hero-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+        background: url('/path-to-hero-image.jpg') center/cover no-repeat;
+        text-align: center;
+        color: $white;
+
+        .hero-content {
+            background: rgba(0, 0, 0, 0.6);
+            padding: $spacing-8;
+            border-radius: $border-radius-md;
+
+            h1 {
+                font-size: $font-size-4xl;
+                margin-bottom: $spacing-4;
+            }
+
+            p {
+                font-size: $font-size-lg;
+                margin-bottom: $spacing-5;
+            }
+
+            .cta-button {
+                background: $danger-color;
+                color: $white;
+                padding: $spacing-3 $spacing-5;
+                border: none;
+                border-radius: $border-radius-sm;
+                font-size: $font-size-base;
+                cursor: pointer;
+                transition: background $transition-normal;
+
+                &:hover {
+                    background: color.adjust($danger-color, $lightness: -10%);
+                }
+            }
+        }
+    }
+
+    .features-section {
+        text-align: center;
+        padding: $spacing-16 $spacing-8;
+
+        h2 {
+            font-size: $font-size-3xl;
+            margin-bottom: $spacing-8;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: $spacing-8;
+            max-width: $container-max-width-lg;
+            margin: auto;
+        }
+
+        .feature-card {
+            background: $gray-100;
+            padding: $spacing-8;
+            border-radius: $border-radius-md;
+            box-shadow: $shadow-md;
+            text-align: center;
+
+            .feature-icon {
+                font-size: $font-size-3xl;
+                margin-bottom: $spacing-4;
+            }
+        }
+    }
+
+    .trending-section {
+        text-align: center;
+        padding: $spacing-16 $spacing-8;
+        background: $gray-200;
+
+        h2 {
+            font-size: $font-size-3xl;
+            margin-bottom: $spacing-8;
+        }
+
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: $spacing-8;
+            max-width: $container-max-width-lg;
+            margin: auto;
+        }
+
+        .trending-card {
+            background: $white;
+            padding: $spacing-6;
+            border-radius: $border-radius-md;
+            box-shadow: $shadow-md;
+
+            .trending-image-placeholder {
+                width: 100%;
+                height: 150px;
+                background: $gray-300;
+                border-radius: $border-radius-md;
+                margin-bottom: $spacing-4;
+            }
+        }
+    }
+}

@@ -1,0 +1,102 @@
+@use '../variable.scss' as *;
+@use "sass:color";
+
+
+.interests-section {
+    max-width: $survey-max-width;
+    margin: 0 auto;
+    padding: $spacing-6;
+    background: $bg-light;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-lg;
+    text-align: center;
+
+    h2 {
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-semibold;
+        margin-bottom: $spacing-4;
+    }
+
+    p {
+        font-size: $font-size-md;
+        color: $gray-600;
+        margin-bottom: $spacing-6;
+    }
+
+    h3 {
+        font-size: $font-size-xl;
+        font-weight: $font-weight-medium;
+        margin-bottom: $spacing-3;
+        color: $primary-color;
+    }
+
+    .interest-grid, .activity-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: $spacing-4;
+        margin-bottom: $spacing-6;
+    }
+
+    .interest-card, .activity-card {
+        background: $gray-100;
+        border-radius: $border-radius-md;
+        padding: $spacing-3;
+        text-align: center;
+        cursor: pointer;
+        transition: background $transition-normal, transform $transition-fast;
+        box-shadow: $shadow-sm;
+
+        &:hover {
+            background: $gray-200;
+            transform: scale(1.05);
+        }
+
+        &.selected {
+            background: $primary-light;
+            color: $white;
+            font-weight: $font-weight-medium;
+            box-shadow: $shadow-md;
+        }
+
+        .interest-icon, .activity-icon {
+            font-size: $font-size-2xl;
+            margin-bottom: $spacing-2;
+        }
+
+        .interest-label, .activity-label {
+            font-size: $font-size-md;
+        }
+    }
+
+    .survey-navigation {
+        margin-top: $spacing-6;
+
+        .next-button {
+            background: $primary-color;
+            color: $white;
+            font-size: $font-size-lg;
+            font-weight: $font-weight-medium;
+            padding: $spacing-3 $spacing-6;
+            border: none;
+            border-radius: $border-radius-md;
+            cursor: pointer;
+            transition: background $transition-fast;
+
+            &:hover {
+                background: $primary-dark;
+            }
+
+            &:disabled {
+                background: $gray-400;
+                cursor: not-allowed;
+            }
+        }
+    }
+}
+
+// Responsive Design
+@media (max-width: $breakpoint-md) {
+    .interest-grid, .activity-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+}

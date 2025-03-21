@@ -1,0 +1,8 @@
+body {
+  background-color: rgba(143, 233, 91, 0.5); /* Semi-transparent white */
+
+}
+
+.main-content{
+  height: 100vh;
+}

@@ -1,0 +1,32 @@
+@use '../variable.scss' as *;
+@use "sass:color";
+
+
+.recommendation-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+    
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+.empty-recommendations {
+    text-align: center;
+    padding: 2rem;
+    background: $light-gray;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    
+    h3 {
+        color: $primary-color;
+        margin-bottom: 0.5rem;
+    }
+    
+    p {
+        color: $text-muted;
+    }
+}
