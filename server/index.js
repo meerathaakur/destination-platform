@@ -7,7 +7,7 @@ import path from "path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv/config";
+import "dotenv/config";
 import { connectDB } from "./config/db.config.js";
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "./models/user.model.js";
