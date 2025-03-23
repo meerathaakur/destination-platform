@@ -8,16 +8,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv/config";
-import passport from "passport";
 import { connectDB } from "./config/db.config.js";
 import { v2 as cloudinary } from "cloudinary";
-import passportConfig from "./config/passport.config.js";
 import userModel from "./models/user.model.js";
 import redisClient from "./config/redis.config.js";
 
-
 // Import Routes (Uncomment when routes are available)
-// import authRoutes from "./routes/authRoutes.js";
+import authRouter from "./routers/auth.route.js"
 // import userRoutes from "./routes/userRoutes.js";
 // import destinationRoutes from "./routes/destinationRoutes.js";
 // import reviewRoutes from "./routes/reviewRoutes.js";
@@ -25,26 +22,28 @@ import redisClient from "./config/redis.config.js";
 // import surveyRoutes from "./routes/surveyRoutes.js";
 
 // Import middleware
-// import { errorHandler } from "./middleware/errorHandler.js";
+// import { AuthenticationMW } from "./middlewares/auth.middleware.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Initialize passport
-passportConfig(passport);
-app.use(passport.initialize());
 
 // Middleware
 app.use(cookieParser());
 app.use(helmet());
 app.use(compression());
 app.use(morgan("dev"));
-app.use(cors());
+// ✅ Configure CORS correctly
+app.use(cors({
+    origin: "http://localhost:5173" ,  // 🔹 Allow only your frontend
+    credentials: true,                 // 🔹 Allow sending cookies (HttpOnly)
+    methods: "GET,POST,PUT,DELETE",    // 🔹 Allowed request methods
+    allowedHeaders: "Content-Type,Authorization" // 🔹 Allowed headers
+}));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Routes Middleware (Uncomment when routes are available)
-// app.use("/api/auth", authRoutes);
 // app.use("/api/users", userRoutes);
 // app.use("/api/destinations", destinationRoutes);
 // app.use("/api/reviews", reviewRoutes);
@@ -63,23 +62,26 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.get("/", (req, res) => {
     res.send("API is working...");
 });
+app.use("/api/auth", authRouter);
+
 
 // Redis Test - Setting and Retrieving a Key
-redisClient.set("myKey", "Hello, Redis!", "EX", 3600, (err, reply) => {
-    if (err) console.error("Redis SET Error:", err);
-    else console.log("Redis SET Success:", reply);
-});
+// redisClient.set("myKey", "Hello, Redis!", "EX", 3600, (err, reply) => {
+//     if (err) console.error("Redis SET Error:", err);
+//     else console.log("Redis SET Success:", reply);
+// });
 
-redisClient.get("myKey", (err, value) => {
-    if (err) console.error("Redis GET Error:", err);
-    else console.log("Stored Value in Redis:", value);
-});
+// redisClient.get("myKey", (err, value) => {
+//     if (err) console.error("Redis GET Error:", err);
+//     else console.log("Stored Value in Redis:", value);
+// });
 
 // Error handling middleware (Uncomment when implemented)
-// app.use(errorHandler);
+// app.use(AuthenticationMW);
 
-app.listen(port, () => {
+app.listen(port, async() => {
+    await connectDB()
     console.log(`Server is running at port ${port}`);
 });
 
-export default app;
+// export default app;

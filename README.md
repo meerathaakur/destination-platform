@@ -1,126 +1,117 @@
-# destination-platform
-Client Side structure
+# Destination Recommendation Platform
 
-```
-destination-recommendation-app/
-├── public/
-│   ├── images/
-│   │   ├── destinations/
-│   │   └── icons/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   │   ├── common/
-│   │   │   ├── Header.jsx
-│   │   │   ├── Footer.jsx
-│   │   │   ├── Navbar.jsx
-│   │   │   └── LoadingSpinner.jsx
-│   │   ├── survey/
-│   │   │   ├── PreferenceSurvey.jsx
-│   │   │   ├── InterestsSection.jsx
-│   │   │   ├── BudgetSection.jsx
-│   │   │   └── TravelStyleSection.jsx
-│   │   ├── recommendations/
-│   │   │   ├── RecommendationCard.jsx
-│   │   │   ├── RecommendationList.jsx
-│   │   │   └── FilterOptions.jsx
-│   │   ├── map/
-│   │   │   ├── InteractiveMap.jsx
-│   │   │   └── MapMarker.jsx
-│   │   ├── reviews/
-│   │   │   ├── ReviewForm.jsx
-│   │   │   └── ReviewList.jsx
-│   │   ├── itinerary/
-│   │   │   ├── ItineraryBuilder.jsx
-│   │   │   └── ItineraryItem.jsx
-│   │   ├── comparison/
-│   │   │   └── DestinationComparison.jsx
-│   │   └── profile/
-│   │       ├── UserProfile.jsx
-│   │       └── TravelHistory.jsx
-│   ├── contexts/
-│   │   └── AuthContext.jsx
-│   ├── hooks/
-│   │   ├── useRecommendations.js
-│   │   └── useUserPreferences.js
-│   ├── pages/
-│   │   ├── HomePage.jsx
-│   │   ├── SurveyPage.jsx
-│   │   ├── RecommendationsPage.jsx
-│   │   ├── DestinationDetailPage.jsx
-│   │   ├── ItineraryPage.jsx
-│   │   ├── ProfilePage.jsx
-│   │   └── ComparisonPage.jsx
-│   ├── services/
-│   │   ├── api.js
-│   │   ├── recommendationService.js
-│   │   └── userService.js
-│   ├── store/
-│   │   ├── preferenceStore.js
-│   │   └── recommendationStore.js
-│   ├── styles/
-│   │   ├── variables.scss
-│   │   ├── global.scss
-│   │   └── components/
-│   ├── utils/
-│   │   ├── helpers.js
-│   │   └── constants.js
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── routes.jsx
-└── index.html
+## Introduction
+We are there to show you where you have to spend your vacation. It would be comfortable and pocket friendly. So let's explore us and find some better.
+
+## Project Type
+Fullstack
+
+## Deplolyed App
+Frontend: https://deployed-site.whatever
+Backend: https://deployed-site.whatever
+Database: https://deployed-site.whatever
+
+## Directory Structure
+destination-platform/
+├─ client/
+├─ server/
+
+## Video Walkthrough of the project
+Attach a very short video walkthough of all of the features [ 1 - 3 minutes ]
+
+## Video Walkthrough of the codebase
+Attach a very short video walkthough of codebase [ 1 - 5 minutes ]
+
+## Features
+List out the key features of your application.
+
+- Feature 1 -> It is user friendly. Save time for searching huge things to go. 
+- Feature 2 -> It has user, admin, super-admin credential which make it more real.
+- Feature 3 -> Also I'm working on it's chatting part where user can make some connections
+- Feature 4 -> Docker part it pending... (work in progress)
+
+## design decisions or assumptions
+- Client-Server Architecture
+- Modular Design
+- JWT-based Authentication
+- Role-Based Access Control (RBAC)
+- CORS Protection
+- MongoDB + Mongoose
+
+## Installation & Getting started
+Detailed instructions on how to install, configure, and get the project running. For BE/FS projects, guide the reviewer how to check mongodb schema etc.
+
+client-side
+```bash
+npm install react-router-dom axios leaflet react-leaflet reack-hook-form zustand immer recharts
+npm install @mui/material @mui/icons-material @emotion/styled date-fns uuid lodash
+npm start
 ```
 
-
-Server side structure
-
+server-side
+```bash
+npm init -y
+npm install express mongoose cors multer morgan helmet bcrypt bcryptjs jsonwebtoken path cookie-parser cloudinary path compression
+npm install --save-dev nodemon dotenv
 ```
-destination-recommendation-api/
-├── config/
-│   ├── database.js         # Database connection configuration
-│   ├── passport.js         # Authentication configuration
-│   └── config.js           # Environment variables and app configuration
-├── controllers/
-│   ├── authController.js   # User authentication (signup, login, etc.)
-│   ├── userController.js   # User profile and preferences management
-│   ├── destinationController.js # Destination data and recommendations
-│   ├── reviewController.js # User reviews and ratings
-│   ├── itineraryController.js  # User itineraries management
-│   └── adminController.js  # Admin functionality (optional)
-├── middleware/
-│   ├── auth.js             # Authentication middleware
-│   ├── validation.js       # Input validation middleware
-│   ├── errorHandler.js     # Error handling middleware
-│   └── rateLimit.js        # Rate limiting for API endpoints
-├── models/
-│   ├── User.js             # User schema (profile, preferences, history)
-│   ├── Destination.js      # Destination schema (details, images, etc.)
-│   ├── Review.js           # Review schema (ratings, comments)
-│   ├── Itinerary.js        # Itinerary schema (saved trips, activities)
-│   └── Activity.js         # Activities schema (things to do at destinations)
-├── routes/
-│   ├── authRoutes.js       # Authentication routes
-│   ├── userRoutes.js       # User-related routes
-│   ├── destinationRoutes.js # Destination and recommendation routes
-│   ├── reviewRoutes.js     # Review and rating routes
-│   ├── itineraryRoutes.js  # Itinerary management routes
-│   └── adminRoutes.js      # Admin routes (optional)
-├── services/
-│   ├── recommendationService.js # Recommendation algorithm
-│   ├── imageService.js     # Image upload and processing
-│   ├── notificationService.js   # User notifications (optional)
-│   └── analyticsService.js # Usage analytics (optional)
-├── utils/
-│   ├── helpers.js          # Utility functions
-│   ├── validators.js       # Input validation functions
-│   └── seedData.js         # Initial data for development
-├── tests/
-│   ├── unit/               # Unit tests
-│   ├── integration/        # Integration tests
-│   └── testUtils.js        # Test utilities
-├── .env                    # Environment variables
-├── .gitignore              # Git ignore file
-├── package.json            # Package configuration
-├── server.js               # Main application entry point
-└── README.md               # Project documentation
+
+## Usage
+Provide instructions and examples on how to use your project.
+Let's find some mistakes and learn. If you collab with us you find mistakes and also got some basic fundamentals. You can clone repo and run in your local environment or go through the provided link
+
+```bash
+git clone https://github.com/meerathaakur/destination-platform.git
 ```
+
+Include screenshots as necessary.
+![alt text](<Screenshot 2025-03-24 031206-1.png>)
+![alt text](<Screenshot 2025-03-24 031417-1.png>)
+![alt text](<Screenshot 2025-03-24 031409-1.png>) 
+![alt text](<Screenshot 2025-03-24 031335-1.png>) 
+![alt text](<Screenshot 2025-03-24 031323-1.png>) 
+![alt text](<Screenshot 2025-03-24 031258-1.png>) 
+![alt text](<Screenshot 2025-03-24 031224-1.png>)
+
+## Credentials
+Provide user credentials for autheticated pages
+
+login:{
+    email: "",
+    password: ""
+}
+
+first sign up with your credential then login
+
+sign up:{
+    name: "",
+    email: "",
+    phone: "",
+    password: ""
+}
+
+## APIs Used
+If your application relies on external APIs, document them and include any necessary links or references.
+/login
+/register
+/survey
+/recommendation
+/forgot-password
+
+
+## API Endpoints
+In case of Backend Applications provide a list of your API endpoints, methods, brief descriptions, and examples of request/response.
+GET / - test routes
+POST /api/auth/register- create a new item
+POST /api/auth/login- login user
+
+
+
+## Technology Stack
+List and provide a brief overview of the technologies used in the project.
+
+- React + vite (frontend)
+- tailwindcss
+- Node.js
+- Express.js
+- MongoDB 
+- Docker (Remaining)

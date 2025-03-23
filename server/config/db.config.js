@@ -1,6 +1,7 @@
-import { connect } from "mongoose"
+import mongoose from "mongoose"
+const { connect } =mongoose;
 import "dotenv/config"
-const MONGO_URL=process.env.MONGO_URI
+const MONGO_URL=process.env.MONGO_URI || process.env.MONGO_URL_PROD
 
 export async function connectDB(){
     try {

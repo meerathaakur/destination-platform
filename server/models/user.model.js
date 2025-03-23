@@ -14,15 +14,33 @@ const userSchema = new Schema(
       unique: true,
       match: [/^\d{10}$/, "Phone number must be exactly 10 digits"],
     },
-    location: { type: String, trim: true },
-    savedDestinations: [{ type: Schema.Types.ObjectId, ref: "Destination" }],
+    // location: { type: String, trim: true },
+
+    // Role field to differentiate between user and admin
+    role: {
+      type: String,
+      enum: ["user", "admin", "superadmin"],
+      default: "user", // Default role is 'user'
+    },
+
+    // savedDestinations: [
+    //   {
+    //     name: { type: String, required: true, trim: true },
+    //     country: { type: String, trim: true },
+    //     image: { type: String, default: "" },
+    //   },
+    // ],
+
     resetToken: { type: String, default: null },
-    travelHistory: [
-      {
-        destination: { type: Schema.Types.ObjectId, ref: "Destination" },
-        visitedDate: { type: Date, default: Date.now },
-      },
-    ],
+
+    // travelHistory: [
+    //   {
+    //     name: { type: String, required: true, trim: true },
+    //     country: { type: String, trim: true },
+    //     visitedDate: { type: Date, default: Date.now },
+    //   },
+    // ],
+
     preferences: {
       budget: { type: String, enum: ["low", "medium", "high"], default: "medium" },
       interests: [{ type: String, trim: true }],

@@ -1,7 +1,12 @@
-import User from "../models/User.js";
-import { sign } from "jsonwebtoken";
+import User from "../models/user.model.js";
+import jwt from "jsonwebtoken"
+const { sign } = jwt;
 import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
+
+import OTPModel from "../models/otp.model.js";
+import { sendOTP } from "../config/mailer.config.js";
+
 
 // Function to generate JWT Token
 const generateToken = (userId) => {
@@ -19,30 +24,38 @@ export async function register(req, res) {
         return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { name, email, password } = req.body;
+    const { name, email, password, phone, role } = req.body; // Accept 'role' in the request
 
     try {
         let user = await User.findOne({ email });
 
         if (user) {
-            return res.status(400).json({ success: false, error: "User already exists with this email" });
+            return res.status(400).json({ success: false, message: "User already exists. Please login" });
         }
 
         // Hash password before saving
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Prevent users from setting 'admin' or 'superadmin' roles themselves
+        let assignedRole = "user"; // Default role
+        if (role && (role === "admin" || role === "superadmin")) {
+            return res.status(403).json({ success: false, message: "You cannot assign an admin role yourself" });
+        }
+
         user = new User({
             name,
             email,
             password: hashedPassword,
+            phone,
+            role: assignedRole, // Ensuring users are not self-assigning higher roles
         });
 
         await user.save();
 
         // Generate JWT token
         const token = generateToken(user.id);
-
+        console.log(token)
         res.status(201).json({
             success: true,
             token,
@@ -50,14 +63,16 @@ export async function register(req, res) {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                phone: user.phone,
                 role: user.role,
             },
         });
     } catch (err) {
-        console.error(err.message);
+        console.error(err.message, err);
         res.status(500).json({ success: false, error: "Server error" });
     }
 }
+
 
 // @desc    Login user
 // @route   POST /api/auth/login
@@ -74,18 +89,23 @@ export async function login(req, res) {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(401).json({ success: false, error: "Invalid credentials" });
+            return res.status(401).json({ success: false, message: "User does not exist. Please signup" });
         }
 
         // Compare hashed password
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            return res.status(401).json({ success: false, error: "Invalid credentials" });
+            return res.status(401).json({ success: false, message: "Incorrect password" });
         }
 
         const token = generateToken(user.id);
-
+        console.log(token)
+        res.cookie("token", token, {
+            httpOnly: true,  // Prevents JavaScript access (more secure)
+            secure: false,   // Change to true in production (for HTTPS)
+            sameSite: "lax", // Controls cross-site behavior
+        });
         res.json({
             success: true,
             token,
@@ -168,15 +188,61 @@ export async function forgotPassword(req, res) {
         if (!user) {
             return res.status(404).json({ success: false, error: "No user found with that email" });
         }
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // console.log(otp)
+        // Save OTP in database
+        await OTPModel.create({ email, otp });
+
+        // Send OTP via email
+        await sendOTP(email, otp);
 
         // In a real implementation, you would:
         // 1. Generate a reset token
         // 2. Save it to the user record with an expiration
         // 3. Send an email with a reset link
 
-        res.json({ success: true, message: "Password reset instructions sent to your email" });
+        res.json({ message: "OTP sent to your email" });
+
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ success: false, error: "Server error" });
     }
 }
+
+
+export const verifyOTP = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const otpRecord = await OTPModel.findOne({ email, otp });
+        if (!otpRecord) return res.status(400).json({ message: "Invalid OTP or expired" });
+
+        res.json({ message: "OTP verified successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    const { email, newPassword, otp } = req.body;
+
+    try {
+        // Check OTP
+        const otpRecord = await OTPModel.findOne({ email, otp });
+        if (!otpRecord) return res.status(400).json({ message: "Invalid OTP or expired" });
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password
+        await User.findOneAndUpdate({ email }, { password: hashedPassword });
+
+        // Delete OTP after use
+        await OTPModel.deleteOne({ email });
+
+        res.json({ message: "Password reset successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
