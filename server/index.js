@@ -35,7 +35,7 @@ app.use(compression());
 app.use(morgan("dev"));
 // ✅ Configure CORS correctly
 app.use(cors({
-    origin: "http://localhost:5173" ,  // 🔹 Allow only your frontend
+    origin: "http://localhost:5173" || "https://destination-platform.vercel.app/",  // 🔹 Allow only your frontend
     credentials: true,                 // 🔹 Allow sending cookies (HttpOnly)
     methods: "GET,POST,PUT,DELETE",    // 🔹 Allowed request methods
     allowedHeaders: "Content-Type,Authorization" // 🔹 Allowed headers
@@ -79,7 +79,7 @@ app.use("/api/auth", authRouter);
 // Error handling middleware (Uncomment when implemented)
 // app.use(AuthenticationMW);
 
-app.listen(port, async() => {
+app.listen(port, async () => {
     await connectDB()
     console.log(`Server is running at port ${port}`);
 });
