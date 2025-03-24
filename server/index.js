@@ -10,7 +10,7 @@ import "dotenv/config";
 import { connectDB } from "./config/db.config.js";
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "./models/user.model.js";
-import redisClient from "./config/redis.config.js";
+// import redisClient from "./config/redis.config.js";
 
 // Import Routes (Uncomment when routes are available)
 import authRouter from "./routers/auth.route.js"
