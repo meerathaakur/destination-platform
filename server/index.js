@@ -4,7 +4,6 @@ import morgan from "morgan";
 import helmet from "helmet";
 import compression from "compression";
 import path from "path";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
