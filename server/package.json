@@ -13,13 +13,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.3",
     "cloudinary": "^2.6.0",
     "compression": "^1.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
@@ -33,7 +33,6 @@
     "url": "^0.11.4"
   },
   "devDependencies": {
-    "dotenv": "^16.4.7",
     "ioredis": "^5.6.0",
     "nodemon": "^3.1.9"
   }
