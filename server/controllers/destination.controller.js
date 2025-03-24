@@ -1,22 +1,10 @@
 import Destination from "../models/destination.model.js";
-import redisClient from "../config/redis.config.js";
 
-// ✅ Get All Destinations (with caching)
+// ✅ Get All Destinations (without caching)
 export const getAllDestinations = async (req, res) => {
     try {
-        // Check Redis Cache First
-        redisClient.get("allDestinations", async (err, cachedData) => {
-            if (err) console.error("Redis GET Error:", err);
-
-            if (cachedData) {
-                return res.status(200).json({ source: "cache", data: JSON.parse(cachedData) });
-            }
-
-            const destinations = await Destination.find();
-            redisClient.setex("allDestinations", 3600, JSON.stringify(destinations)); // Cache for 1 hour
-
-            res.status(200).json({ source: "database", data: destinations });
-        });
+        const destinations = await Destination.find();
+        res.status(200).json({ data: destinations });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
@@ -83,9 +71,6 @@ export const createDestination = async (req, res) => {
         const newDestination = new Destination(req.body);
         const savedDestination = await newDestination.save();
 
-        // Invalidate Cache
-        redisClient.del("allDestinations");
-
         res.status(201).json(savedDestination);
     } catch (error) {
         res.status(500).json({ message: "Error creating destination", error });
@@ -100,9 +85,6 @@ export const updateDestination = async (req, res) => {
 
         if (!updatedDestination) return res.status(404).json({ message: "Destination not found" });
 
-        // Invalidate Cache
-        redisClient.del("allDestinations");
-
         res.status(200).json(updatedDestination);
     } catch (error) {
         res.status(500).json({ message: "Error updating destination", error });
@@ -116,9 +98,6 @@ export const deleteDestination = async (req, res) => {
         const deletedDestination = await Destination.findByIdAndDelete(id);
 
         if (!deletedDestination) return res.status(404).json({ message: "Destination not found" });
-
-        // Invalidate Cache
-        redisClient.del("allDestinations");
 
         res.status(200).json({ message: "Destination deleted successfully" });
     } catch (error) {

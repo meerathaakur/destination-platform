@@ -10,7 +10,6 @@ import "dotenv/config";
 import { connectDB } from "./config/db.config.js";
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "./models/user.model.js";
-// import redisClient from "./config/redis.config.js";
 
 // Import Routes (Uncomment when routes are available)
 import authRouter from "./routers/auth.route.js"
@@ -62,18 +61,6 @@ app.get("/", (req, res) => {
     res.send("API is working...");
 });
 app.use("/api/auth", authRouter);
-
-
-// Redis Test - Setting and Retrieving a Key
-// redisClient.set("myKey", "Hello, Redis!", "EX", 3600, (err, reply) => {
-//     if (err) console.error("Redis SET Error:", err);
-//     else console.log("Redis SET Success:", reply);
-// });
-
-// redisClient.get("myKey", (err, value) => {
-//     if (err) console.error("Redis GET Error:", err);
-//     else console.log("Stored Value in Redis:", value);
-// });
 
 // Error handling middleware (Uncomment when implemented)
 // app.use(AuthenticationMW);

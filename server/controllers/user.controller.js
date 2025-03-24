@@ -1,22 +1,11 @@
 import User from "../models/user.model.js";
 import Destination from "../models/destination.model.js";
-import redisClient from "../config/redis.config.js";
 
-// ✅ Get All Users (Cached)
+// ✅ Get All Users (without caching)
 export const getAllUsers = async (req, res) => {
     try {
-        redisClient.get("allUsers", async (err, cachedData) => {
-            if (err) console.error("Redis GET Error:", err);
-
-            if (cachedData) {
-                return res.status(200).json({ source: "cache", data: JSON.parse(cachedData) });
-            }
-
-            const users = await User.find().select("-password"); // Exclude password field
-            redisClient.setex("allUsers", 3600, JSON.stringify(users)); // Cache for 1 hour
-
-            res.status(200).json({ source: "database", data: users });
-        });
+        const users = await User.find().select("-password"); // Exclude password field
+        res.status(200).json({ data: users });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
@@ -43,8 +32,6 @@ export const updateUser = async (req, res) => {
 
         if (!updatedUser) return res.status(404).json({ message: "User not found" });
 
-        redisClient.del("allUsers");
-
         res.status(200).json(updatedUser);
     } catch (error) {
         res.status(500).json({ message: "Error updating user", error });
@@ -58,8 +45,6 @@ export const deleteUser = async (req, res) => {
         const deletedUser = await User.findByIdAndDelete(id);
 
         if (!deletedUser) return res.status(404).json({ message: "User not found" });
-
-        redisClient.del("allUsers");
 
         res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {

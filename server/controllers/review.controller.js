@@ -1,23 +1,12 @@
 import Review from "../models/review.model.js";
 import Destination from "../models/destination.model.js";
 import Hotel from "../models/hotel.model.js";
-import redisClient from "../config/redis.config.js";
 
-// ✅ Get All Reviews (with Caching)
+// ✅ Get All Reviews (without caching)
 export const getAllReviews = async (req, res) => {
     try {
-        redisClient.get("allReviews", async (err, cachedData) => {
-            if (err) console.error("Redis GET Error:", err);
-
-            if (cachedData) {
-                return res.status(200).json({ source: "cache", data: JSON.parse(cachedData) });
-            }
-
-            const reviews = await Review.find().populate("userId", "name profilePicture");
-            redisClient.setex("allReviews", 3600, JSON.stringify(reviews)); // Cache for 1 hour
-
-            res.status(200).json({ source: "database", data: reviews });
-        });
+        const reviews = await Review.find().populate("userId", "name profilePicture");
+        res.status(200).json({ data: reviews });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
@@ -80,8 +69,6 @@ export const createReview = async (req, res) => {
         const newReview = new Review({ userId, destinationId, rating, hotelId, comment });
         await newReview.save();
 
-        redisClient.del("allReviews"); // Invalidate cache
-
         res.status(201).json({ message: "Review created successfully", review: newReview });
     } catch (error) {
         res.status(500).json({ message: "Error creating review", error });
@@ -98,8 +85,6 @@ export const updateReview = async (req, res) => {
 
         if (!updatedReview) return res.status(404).json({ message: "Review not found" });
 
-        redisClient.del("allReviews");
-
         res.status(200).json({ message: "Review updated", review: updatedReview });
     } catch (error) {
         res.status(500).json({ message: "Error updating review", error });
@@ -113,8 +98,6 @@ export const deleteReview = async (req, res) => {
         const deletedReview = await Review.findByIdAndDelete(id);
 
         if (!deletedReview) return res.status(404).json({ message: "Review not found" });
-
-        redisClient.del("allReviews");
 
         res.status(200).json({ message: "Review deleted successfully" });
     } catch (error) {
