@@ -1,45 +1,54 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ForgotPassword from "../ForgotPassword";
+import SignupPage from "./SignUpPage";
 
 const LoginPage = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false); // initially not loading
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) navigate("/");
+        const checkLoggedIn = async () => {
+            try {
+                const res = await fetch("https://destination-platform.onrender.com/api/auth/me", {
+                    method: "GET",
+                    credentials: "include",
+                });
+                if (res.ok) navigate("/");
+            } catch(error) {
+                setError("Something went wrong",error.message)
+            }
+        };
+        checkLoggedIn();
     }, [navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
-        setLoading(true); // start loading
+        setLoading(true);
 
         try {
-            const response = await fetch("https://destination-platform.onrender.com/api/auth/login", {
+            const res = await fetch("https://destination-platform.onrender.com/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({ email, password }),
             });
 
-            const data = await response.json();
+            const data = await res.json();
 
-            if (response.ok) {
-                localStorage.setItem("token", data.token);
-                navigate("/"); // successful login
-            } else {
+            if (!res.ok) {
                 setError(data.message || "Invalid email or password.");
+            } else {
+                navigate("/");
             }
         } catch (err) {
-            console.error("Login error:", err);
-            setError("Something went wrong. Please try again.");
+            setError("Something went wrong. Please try again.",err.message);
         } finally {
-            setLoading(false); // stop loading
+            setLoading(false);
         }
     };
 
@@ -59,7 +68,6 @@ const LoginPage = () => {
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {error && <p className="text-red-500 text-center">{error}</p>}
-                    {loading && <p className="text-blue-500 text-center">Logging in...</p>}
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-900">
@@ -74,7 +82,6 @@ const LoginPage = () => {
                                 autoComplete="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                disabled={loading}
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                             />
                         </div>
@@ -98,7 +105,6 @@ const LoginPage = () => {
                                 autoComplete="current-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                disabled={loading}
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                             />
                         </div>
@@ -108,9 +114,7 @@ const LoginPage = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`flex w-full justify-center rounded-md ${
-                                loading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-500"
-                            } px-3 py-1.5 text-sm font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >
                             {loading ? "Signing in..." : "Sign in"}
                         </button>

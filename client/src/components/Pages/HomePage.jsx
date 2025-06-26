@@ -1,5 +1,5 @@
-import { useNavigate,Link } from 'react-router-dom';
-import { useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
 import FeatureCard from '../FeatureCard';
 
 const features = [
@@ -9,39 +9,40 @@ const features = [
 ];
 
 const DESTINATION = [
-    {
-        name: "Bali, Indonesia",
-        image: "https://il.bestattravel.co.uk/Images/Cropped/ASI-208799-LeadBaliTemple-2-BaliTemple.jpeg"
-    },
-    {
-        name: "Kyoto, Japan",
-        image: "https://i0.wp.com/www.touristjapan.com/wp-content/uploads/2025/01/map-of-kyoto-japan-travel-scaled.jpg?resize=768%2C512&ssl=1"
-    },
-    {
-        name: "Santorini, Greece",
-        image: "https://www.gokitetours.com/wp-content/uploads/2024/09/The-Most-Beautiful-Places-to-Visit-in-Santorini-Greece.webp"
-    },
-    {
-        name: "Tulum, Mexico",
-        image: "https://lp-cms-production.imgix.net/2019-06/fab6b5f03e66bb144875992631973f01-tulum-ruins.jpg"
-    }
+    { name: "Bali, Indonesia", image: "https://il.bestattravel.co.uk/Images/Cropped/ASI-208799-LeadBaliTemple-2-BaliTemple.jpeg" },
+    { name: "Kyoto, Japan", image: "https://i0.wp.com/www.touristjapan.com/wp-content/uploads/2025/01/map-of-kyoto-japan-travel-scaled.jpg?resize=768%2C512&ssl=1" },
+    { name: "Santorini, Greece", image: "https://www.gokitetours.com/wp-content/uploads/2024/09/The-Most-Beautiful-Places-to-Visit-in-Santorini-Greece.webp" },
+    { name: "Tulum, Mexico", image: "https://lp-cms-production.imgix.net/2019-06/fab6b5f03e66bb144875992631973f01-tulum-ruins.jpg" }
 ];
 
 const HomePage = () => {
     const navigate = useNavigate();
-
-    // Simulated authentication check (replace this with actual API call)
-    const isAuthenticated = !!localStorage.getItem("token"); // Example with localStorage
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            navigate("/login"); // Redirect to login page if not authenticated
-        }
-    }, [isAuthenticated, navigate]);
+        const checkAuth = async () => {
+            try {
+                const res = await fetch("https://destination-platform.onrender.com/api/auth/me", {
+                    method: "GET",
+                    credentials: "include",
+                });
+                if (!res.ok) navigate("/login");
+            } catch (e) {
+                navigate("/login");
+                console.log(e)
+            } finally {
+                setLoading(false);
+            }
+        };
+        checkAuth();
+    }, [navigate]);
+
+    if (loading) {
+        return <div className="h-screen flex items-center justify-center text-xl">Loading...</div>;
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-            {/* Hero Section */}
             <section className="flex flex-col items-center justify-center text-center py-20 px-4">
                 <h1 className="text-4xl font-extrabold sm:text-5xl">Discover Your Perfect Destination</h1>
                 <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
@@ -55,7 +56,6 @@ const HomePage = () => {
                 </button>
             </section>
 
-            {/* Features Section */}
             <section className="py-16 px-4">
                 <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -65,7 +65,6 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* Trending Destinations Section */}
             <section className="py-16 px-4 bg-gray-200 dark:bg-gray-800">
                 <h2 className="text-3xl font-bold text-center mb-8">Trending Destinations</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
