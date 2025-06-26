@@ -33,7 +33,7 @@ app.use(compression());
 app.use(morgan("dev"));
 // ✅ Configure CORS correctly
 app.use(cors({
-    origin: "http://localhost:5173" || "https://destination-platform.vercel.app/",  // 🔹 Allow only your frontend
+    origin: "https://destination-platform.vercel.app/",  // 🔹 Allow only your frontend
     credentials: true,                 // 🔹 Allow sending cookies (HttpOnly)
     methods: "GET,POST,PUT,DELETE",    // 🔹 Allowed request methods
     allowedHeaders: "Content-Type,Authorization" // 🔹 Allowed headers
