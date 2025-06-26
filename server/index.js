@@ -20,7 +20,7 @@ import authRouter from "./routers/auth.route.js"
 // import surveyRoutes from "./routes/surveyRoutes.js";
 
 // Import middleware
-// import { AuthenticationMW } from "./middlewares/auth.middleware.js";
+import { AuthenticationMW } from "./middlewares/auth.middleware.js";
 
 const app = express();
 const port = process.env.PORT || 3000;

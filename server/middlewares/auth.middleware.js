@@ -5,16 +5,21 @@ import { check } from "express-validator";
 const { verify } = jwt;
 
 export function AuthenticationMW(req, res, next) {
-    const token = req.headers.authorization?.split(" ")[1]
-    verify(token, 'secret-key', (err, decoded) => {
+    const authHeader = req.headers.authorization
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "No token provided. Please log in." });
+    }
+
+    const token = authHeader?.split(" ")[1]
+    verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
-            return res.send("Please login first")
-        } else {
-            console.log("printing decodedfrom Authentication middleware")
-            console.log(decoded)
-            req.user = decoded.role
-            next()
+            return res.status(403).json({ message: "Invalid or expired token. Please log in again." });
         }
+        console.log("printing decodedfrom Authentication middleware")
+        console.log(decoded)
+        req.user = decoded
+        next()
     })
 }
 // Middleware to validate user registration input

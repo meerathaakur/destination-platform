@@ -24,43 +24,44 @@ export async function register(req, res) {
         return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { name, email, password, phone, role } = req.body; // Accept 'role' in the request
+    const { name, email, password, phone, role } = req.body;
 
     try {
         let user = await User.findOne({ email });
 
         if (user) {
-            return res.status(400).json({ success: false, message: "User already exists. Please login" });
+            return res.status(400).json({ success: false, message: "User already exists. Please login." });
         }
 
-        // Hash password before saving
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        // Prevent users from setting 'admin' or 'superadmin' roles themselves
-        let assignedRole = "user"; // Default role
-        if (role && (role === "admin" || role === "superadmin")) {
-            return res.status(403).json({ success: false, message: "You cannot assign an admin role yourself" });
+        // Prevent malicious role escalation
+        if (role && ["admin", "superadmin"].includes(role)) {
+            return res.status(403).json({ success: false, message: "You cannot assign an admin role yourself." });
         }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         user = new User({
             name,
             email,
             password: hashedPassword,
             phone,
-            role: assignedRole, // Ensuring users are not self-assigning higher roles
+            role: "user", // Always defaults to 'user'
         });
 
         await user.save();
 
-        // Generate JWT token
-        const token = generateToken(user.id);
-        console.log(token)
+        const token = generateToken(user._id); // ✅ use _id instead of id
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // true for HTTPS in production
+            sameSite: "lax",
+        });
+
         res.status(201).json({
             success: true,
             token,
             user: {
-                id: user.id,
+                id: user._id,
                 name: user.name,
                 email: user.email,
                 phone: user.phone,
@@ -68,10 +69,11 @@ export async function register(req, res) {
             },
         });
     } catch (err) {
-        console.error(err.message, err);
+        console.error("Register error:", err.message);
         res.status(500).json({ success: false, error: "Server error" });
     }
 }
+
 
 
 // @desc    Login user
@@ -89,45 +91,55 @@ export async function login(req, res) {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(401).json({ success: false, message: "User does not exist. Please signup" });
+            return res.status(401).json({ success: false, message: "User does not exist. Please signup." });
         }
 
-        // Compare hashed password
         const isMatch = await bcrypt.compare(password, user.password);
-
         if (!isMatch) {
-            return res.status(401).json({ success: false, message: "Incorrect password" });
+            return res.status(401).json({ success: false, message: "Incorrect password." });
         }
 
-        const token = generateToken(user.id);
-        console.log(token)
+        const token = generateToken(user._id); // ✅ use _id for consistency
+
         res.cookie("token", token, {
-            httpOnly: true,  // Prevents JavaScript access (more secure)
-            secure: false,   // Change to true in production (for HTTPS)
-            sameSite: "lax", // Controls cross-site behavior
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
         });
+
         res.json({
             success: true,
             token,
             user: {
-                id: user.id,
+                id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
             },
         });
     } catch (err) {
-        console.error(err.message);
+        console.error("Login error:", err.message);
         res.status(500).json({ success: false, error: "Server error" });
     }
 }
+
 
 // @desc    Get current user
 // @route   GET /api/auth/me
 // @access  Private
 export async function getCurrentUser(req, res) {
     try {
-        const user = await User.findById(req.user.id).select("-password");
+        const userId = req.user?.id;
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+
+        const user = await User.findById(userId).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
 
         res.json({
             success: true,
