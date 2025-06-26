@@ -26,12 +26,16 @@ const HomePage = () => {
                     method: "GET",
                     credentials: "include",
                 });
-                if (!res.ok) navigate("/login");
+                console.log(res)
+                if (!res.ok) {
+                    navigate("/login");
+                    return;
+                }
+
+                setLoading(false); 
             } catch (e) {
+                console.log("Auth check failed:", e);
                 navigate("/login");
-                console.log(e)
-            } finally {
-                setLoading(false);
             }
         };
         checkAuth();

@@ -10,20 +10,49 @@ import PastTravelersPage from './components/Pages/PastTravelersPage.jsx';
 import ComparisonPage from './components/Pages/ComparisonPage.jsx';
 import SignIn from "./components/Pages/LoginPage"
 import SignupPage from './components/Pages/SignUpPage';
+import ProtectedRoute from './components/ProtectedRoutes.jsx';
 
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={
+        <ProtectedRoute>
+          <HomePage />
+        </ProtectedRoute>} />
+
       <Route path="/login" element={<LoginPage />} />
-      <Route path='/register' element={<SignupPage/>}/>
-      <Route path="/travelers" element={<PastTravelersPage />} />
-      <Route path="/survey" element={<SurveyPage />} />
-      <Route path="/recommendations" element={<RecommendationsPage />} />
-      <Route path="/destination/:id" element={<DestinationDetailPage />} /> 
-      {/* <Route path="/itinerary" element={<ItineraryPage />} /> */}
-      {/* <Route path="/profile" element={<ProfilePage />} /> */}
-      <Route path="/compare" element={<ComparisonPage />} /> 
+      <Route path='/register' element={<SignupPage />} />
+
+      <Route path="/travelers" element={
+        <ProtectedRoute>
+          <PastTravelersPage />
+        </ProtectedRoute>} />
+      <Route path="/survey" element={
+        <ProtectedRoute>
+          <SurveyPage />
+        </ProtectedRoute>} />
+      <Route path="/recommendations" element={
+        <ProtectedRoute>
+          <RecommendationsPage />
+        </ProtectedRoute>} />
+      <Route path="/destination/:id" element={
+        <ProtectedRoute>
+          <DestinationDetailPage />
+        </ProtectedRoute>} />
+      {/* <Route path="/itinerary" element={
+      <ProtectedRoute>
+      <ItineraryPage />
+      </ProtectedRoute>
+      } /> */}
+      {/* <Route path="/profile" element={
+      <ProtectedRoute>
+      <ProfilePage />
+      </ProtectedRoute>
+      } /> */}
+      <Route path="/compare" element={
+        <ProtectedRoute>
+          <ComparisonPage />
+        </ProtectedRoute>} />
     </Routes>
   );
 };
