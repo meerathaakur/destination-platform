@@ -22,7 +22,7 @@ const LoginPage = () => {
         setError(""); // Reset previous errors
 
         try {
-            const response = await fetch("http://localhost:3000/api/auth/login", {
+            const response = await fetch("https://destination-platform.onrender.com/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include", // Ensures HttpOnly cookies are included

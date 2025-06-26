@@ -10,6 +10,7 @@ const SurveyPage = () => {
     const setPreferences = usePreferenceStore((state) => state.setPreferences);
 
     const [step, setStep] = useState(1);
+
     const [formData, setFormData] = useState({
         interests: [],
         activities: [],
@@ -30,18 +31,18 @@ const SurveyPage = () => {
     });
 
     const updateFormData = (section, data) => {
-        setFormData({
-            ...formData,
+        setFormData((prev) => ({
+            ...prev,
             [section]: data,
-        });
+        }));
     };
 
     const nextStep = () => {
-        setStep(step + 1);
+        setStep((prev) => Math.min(prev + 1, 3));
     };
 
     const prevStep = () => {
-        setStep(step - 1);
+        setStep((prev) => Math.max(prev - 1, 1));
     };
 
     const handleSubmit = () => {
@@ -50,69 +51,79 @@ const SurveyPage = () => {
     };
 
     const renderCurrentStep = () => {
-        switch (step) {
-            case 1:
-                return (
-                    <InterestsSection
-                        data={formData.interests}
-                        updateData={(data) => updateFormData("interests", data)}
-                        onNext={nextStep}
-                    />
-                );
-            case 2:
-                return (
-                    <BudgetSection
-                        data={formData.budget}
-                        updateData={(data) => updateFormData("budget", data)}
-                        onNext={nextStep}
-                        onPrev={prevStep}
-                    />
-                );
-            case 3:
-                return (
-                    <TravelStyleSection
-                        data={formData.travelStyle}
-                        updateData={(data) => updateFormData("travelStyle", data)}
-                        onSubmit={handleSubmit}
-                        onPrev={prevStep}
-                    />
-                );
-            default:
-                return null;
-        }
+        const commonProps = {
+            onNext: nextStep,
+            onPrev: prevStep,
+        };
+
+        const steps = {
+            1: (
+                <InterestsSection
+                    key="interests"
+                    data={formData.interests}
+                    updateData={(data) => updateFormData("interests", data)}
+                    onNext={commonProps.onNext}
+                />
+            ),
+            2: (
+                <BudgetSection
+                    key="budget"
+                    data={formData.budget}
+                    updateData={(data) => updateFormData("budget", data)}
+                    onNext={commonProps.onNext}
+                    onPrev={commonProps.onPrev}
+                />
+            ),
+            3: (
+                <TravelStyleSection
+                    key="travelStyle"
+                    data={formData.travelStyle}
+                    updateData={(data) => updateFormData("travelStyle", data)}
+                    onSubmit={handleSubmit}
+                    onPrev={commonProps.onPrev}
+                />
+            ),
+        };
+
+        return steps[step] || null;
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-55 to-indigo-300 p-6">
-            <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-8">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 p-4">
+            <div className="w-full max-w-3xl bg-white shadow-xl rounded-xl p-8">
                 <h1 className="text-3xl font-bold text-center text-gray-800">🌍 Plan Your Dream Vacation</h1>
                 <p className="text-gray-500 text-center mt-2">Tell us about your travel preferences.</p>
 
                 {/* Progress Bar */}
-                <div className="flex justify-between items-center my-6">
-                    {[1, 2, 3].map((stepNumber) => (
-                        <div key={stepNumber} className="relative flex flex-col items-center">
-                            <div
-                                className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-bold ${
-                                    step >= stepNumber ? "bg-blue-600" : "bg-gray-300"
-                                }`}
-                            >
-                                {stepNumber}
-                            </div>
-                            {stepNumber < 3 && (
-                                <div className="w-16 h-1 bg-gray-300 absolute top-1/2 left-12 transform -translate-y-1/2">
-                                    <div
-                                        className={`h-full ${
-                                            step > stepNumber ? "bg-blue-600" : ""
+                <div className="flex justify-center mt-8 mb-4 px-4">
+                    <div className="flex items-center w-full max-w-md">
+                        {[1, 2, 3].map((stepNumber, index) => (
+                            <div key={stepNumber} className="flex items-center w-full relative">
+                                {/* Step Circle */}
+                                <div
+                                    className={`z-10 flex items-center justify-center w-10 h-10 rounded-full text-white font-semibold transition duration-300 ${step >= stepNumber ? "bg-blue-600" : "bg-gray-300"
                                         }`}
-                                    ></div>
+                                >
+                                    {stepNumber}
                                 </div>
-                            )}
-                        </div>
-                    ))}
+
+                                {/* Connector Line (if not last step) */}
+                                {index < 2 && (
+                                    <div className="flex-1 h-1 mx-2 bg-gray-300 relative">
+                                        <div
+                                            className={`absolute top-0 left-0 h-full transition-all duration-300 ${step > stepNumber ? "bg-blue-600 w-full" : "bg-transparent w-0"
+                                                }`}
+                                        ></div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Survey Content */}
+
+
+                {/* Dynamic Step Form Section */}
                 <div className="mt-6">{renderCurrentStep()}</div>
             </div>
         </div>

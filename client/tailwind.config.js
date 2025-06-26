@@ -16,6 +16,8 @@ export default {
             },
             transitionProperty: {
                 'colors': 'color, background-color, border-color, text-decoration-color, fill, stroke',
+                'bg-color': 'background-color',
+                'text-color': 'color',
             }
         },
     },

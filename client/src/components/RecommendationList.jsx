@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import RecommendationCard from "./RecommendationCard";
 
-const RecommendationList = ({ recommendations }) => {
+const RecommendationList = ({ recommendations = [] }) => {
     const navigate = useNavigate();
 
     const handleCardClick = (id) => {
@@ -20,13 +20,13 @@ const RecommendationList = ({ recommendations }) => {
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 py-6">
             {recommendations.map((destination) => (
                 <RecommendationCard
                     key={destination.id}
                     destination={destination}
                     onClick={() => handleCardClick(destination.id)}
-                    className="cursor-pointer transition-transform transform hover:scale-105"
+                    className="cursor-pointer transition-transform duration-300 transform hover:scale-105 hover:shadow-xl"
                 />
             ))}
         </div>

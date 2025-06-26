@@ -11,19 +11,19 @@ const features = [
 const DESTINATION = [
     {
         name: "Bali, Indonesia",
-        image: "https://source.unsplash.com/600x400/?bali"
+        image: "https://il.bestattravel.co.uk/Images/Cropped/ASI-208799-LeadBaliTemple-2-BaliTemple.jpeg"
     },
     {
         name: "Kyoto, Japan",
-        image: "https://source.unsplash.com/600x400/?kyoto"
+        image: "https://i0.wp.com/www.touristjapan.com/wp-content/uploads/2025/01/map-of-kyoto-japan-travel-scaled.jpg?resize=768%2C512&ssl=1"
     },
     {
         name: "Santorini, Greece",
-        image: "https://source.unsplash.com/600x400/?santorini"
+        image: "https://www.gokitetours.com/wp-content/uploads/2024/09/The-Most-Beautiful-Places-to-Visit-in-Santorini-Greece.webp"
     },
     {
         name: "Tulum, Mexico",
-        image: "https://source.unsplash.com/600x400/?tulum"
+        image: "https://lp-cms-production.imgix.net/2019-06/fab6b5f03e66bb144875992631973f01-tulum-ruins.jpg"
     }
 ];
 

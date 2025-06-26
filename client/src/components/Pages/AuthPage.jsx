@@ -22,7 +22,7 @@ const AuthPage = () => {
 
         try {
             // Step 1: Check if user exists
-            const checkResponse = await fetch("http://localhost:3000/api/auth/check-user", {
+            const checkResponse = await fetch("https://destination-platform.onrender.com/api/auth/check-user", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: user.email }),
@@ -32,7 +32,7 @@ const AuthPage = () => {
 
             if (checkResponse.ok && checkData.exists) {
                 // User exists → Login with email & password only
-                const loginResponse = await fetch("http://localhost:3000/api/auth/login", {
+                const loginResponse = await fetch("https://destination-platform.onrender.com/api/auth/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
@@ -55,7 +55,7 @@ const AuthPage = () => {
                 }
 
                 // Proceed with signup
-                const signupResponse = await fetch("http://localhost:3000/api/auth/register", {
+                const signupResponse = await fetch("https://destination-platform.onrender.com/api/auth/register", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",

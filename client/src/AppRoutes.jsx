@@ -3,10 +3,11 @@ import HomePage from './components/Pages/HomePage';
 import LoginPage from "./components/Pages/LoginPage"
 import SurveyPage from './components/Pages/SurveyPage';
 import RecommendationsPage from './components/Pages/Recommendations';
-// import DestinationDetailPage from './pages/DestinationDetailPage';
+import DestinationDetailPage from './components/Pages/DestinationDetailPage';
 // import ItineraryPage from './pages/ItineraryPage';
 // import ProfilePage from './pages/ProfilePage';
-// import ComparisonPage from './pages/ComparisonPage';
+import PastTravelersPage from './components/Pages/PastTravelersPage.jsx';
+import ComparisonPage from './components/Pages/ComparisonPage.jsx';
 import SignIn from "./components/Pages/LoginPage"
 import SignupPage from './components/Pages/SignUpPage';
 
@@ -16,13 +17,13 @@ const AppRoutes = () => {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path='/register' element={<SignupPage/>}/>
-      {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+      <Route path="/travelers" element={<PastTravelersPage />} />
       <Route path="/survey" element={<SurveyPage />} />
       <Route path="/recommendations" element={<RecommendationsPage />} />
-      {/* <Route path="/destination/:id" element={<DestinationDetailPage />} />
-      <Route path="/itinerary" element={<ItineraryPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/compare" element={<ComparisonPage />} /> */}
+      <Route path="/destination/:id" element={<DestinationDetailPage />} /> 
+      {/* <Route path="/itinerary" element={<ItineraryPage />} /> */}
+      {/* <Route path="/profile" element={<ProfilePage />} /> */}
+      <Route path="/compare" element={<ComparisonPage />} /> 
     </Routes>
   );
 };

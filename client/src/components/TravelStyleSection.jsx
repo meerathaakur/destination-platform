@@ -26,19 +26,26 @@ const travelStyleOptions = {
     ]
 };
 
-const TravelStyleSection = ({ data, updateData, onSubmit, onPrev }) => {
-    const [travelStyle, setTravelStyle] = useState(data || {
-        pace: 'moderate',
-        accommodation: 'hotel',
-        tripLength: '7-14 days',
-        travelWith: 'partner'
-    });
+const defaultStyle = {
+    pace: 'moderate',
+    accommodation: 'hotel',
+    tripLength: '7-14 days',
+    travelWith: 'partner'
+};
+
+const formatCategoryLabel = (category) =>
+    category
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, (str) => str.toUpperCase());
+
+const TravelStyleSection = ({ data = {}, updateData, onSubmit, onPrev }) => {
+    const [travelStyle, setTravelStyle] = useState({ ...defaultStyle, ...data });
 
     const handleStyleChange = (category, value) => {
-        setTravelStyle({
-            ...travelStyle,
+        setTravelStyle((prev) => ({
+            ...prev,
             [category]: value
-        });
+        }));
     };
 
     const handleSubmit = () => {
@@ -47,37 +54,54 @@ const TravelStyleSection = ({ data, updateData, onSubmit, onPrev }) => {
     };
 
     return (
-        <div className="p-6 max-w-4xl mx-auto bg-white shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">What's your travel style?</h2>
-            <p className="text-gray-600 mb-6">Tell us how you like to travel</p>
+        <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg">
+            <h2 className="text-2xl font-bold mb-4 text-center">🌐 What's your travel style?</h2>
+            <p className="text-gray-600 text-center mb-6">Tell us how you like to travel</p>
 
             <div className="space-y-6">
-                {Object.keys(travelStyleOptions).map((category) => (
+                {Object.entries(travelStyleOptions).map(([category, options]) => (
                     <div key={category}>
-                        <h3 className="text-lg font-semibold mb-3 capitalize">{category.replace(/([A-Z])/g, ' $1')}</h3>
+                        <h3 className="text-lg font-semibold mb-3 text-gray-700">{formatCategoryLabel(category)}</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {travelStyleOptions[category].map((option) => (
-                                <div
-                                    key={option.value}
-                                    className={`p-4 border rounded-lg cursor-pointer text-center shadow-sm transition-all ${travelStyle[category] === option.value ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
-                                    onClick={() => handleStyleChange(category, option.value)}
-                                >
-                                    <div className="text-2xl">{option.icon}</div>
-                                    <h4 className="font-medium mt-2">{option.label}</h4>
-                                    <p className="text-sm text-gray-700 mt-1">{option.description}</p>
-                                </div>
-                            ))}
+                            {options.map((option) => {
+                                const isSelected = travelStyle[category] === option.value;
+                                return (
+                                    <div
+                                        key={option.value}
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={() => handleStyleChange(category, option.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') handleStyleChange(category, option.value);
+                                        }}
+                                        className={`p-4 border rounded-lg cursor-pointer text-center shadow-sm transition-all 
+                                            ${isSelected ? 'bg-blue-600 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+                                    >
+                                        <div className="text-2xl">{option.icon}</div>
+                                        <h4 className="font-medium mt-2">{option.label}</h4>
+                                        <p className={`text-sm mt-1 ${isSelected ? 'text-white' : 'text-gray-700'}`}>
+                                            {option.description}
+                                        </p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="flex justify-between mt-6">
-                <button className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black rounded-lg" onClick={onPrev}>
-                    Back
+            <div className="flex justify-between mt-8">
+                <button
+                    className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-black rounded-lg"
+                    onClick={onPrev}
+                >
+                    ← Back
                 </button>
-                <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg" onClick={handleSubmit}>
-                    Get My Recommendations
+                <button
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                    onClick={handleSubmit}
+                >
+                    Get My Recommendations →
                 </button>
             </div>
         </div>

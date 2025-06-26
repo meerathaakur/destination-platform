@@ -26,7 +26,13 @@ const SEASON_OPTIONS = [
 ];
 
 const FilterOptions = ({ filters, onFilterChange, interestOptions = [] }) => {
-    const [localFilters, setLocalFilters] = useState(filters);
+    const [localFilters, setLocalFilters] = useState({
+        minRating: filters.minRating || 0,
+        budget: filters.budget || [],
+        interests: filters.interests || [],
+        seasons: filters.seasons || [],
+    });
+
     const [expanded, setExpanded] = useState({
         rating: true,
         budget: true,
@@ -34,8 +40,9 @@ const FilterOptions = ({ filters, onFilterChange, interestOptions = [] }) => {
         seasons: true,
     });
 
+    const validInterestOptions = Array.isArray(interestOptions) ? interestOptions : [];
     const availableInterests = INTEREST_OPTIONS.filter(({ id }) =>
-        interestOptions.includes(id)
+        validInterestOptions.includes(id)
     );
 
     useEffect(() => {
@@ -53,15 +60,20 @@ const FilterOptions = ({ filters, onFilterChange, interestOptions = [] }) => {
     };
 
     const clearAllFilters = () => {
-        setLocalFilters({ minRating: 0, budget: [], interests: [], seasons: [] });
+        setLocalFilters({
+            minRating: 0,
+            budget: [],
+            interests: [],
+            seasons: [],
+        });
     };
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md mx-auto">
-            <div className="flex justify-between items-center border-b pb-2 mb-4">
-                <h3 className="text-lg font-semibold">Filter Options</h3>
+        <div className="bg-white p-6 rounded-2xl shadow-md w-full max-w-md mx-auto transition-all duration-300 border border-gray-200">
+            <div className="flex justify-between items-center border-b pb-3 mb-5">
+                <h3 className="text-xl font-bold text-gray-800">Filter Options</h3>
                 <button
-                    className="text-red-500 hover:underline"
+                    className="text-sm text-red-500 hover:text-red-600 underline transition"
                     onClick={clearAllFilters}
                 >
                     Clear All
@@ -86,12 +98,10 @@ const FilterOptions = ({ filters, onFilterChange, interestOptions = [] }) => {
                                 minRating: parseFloat(e.target.value),
                             }))
                         }
-                        className="w-full cursor-pointer"
+                        className="w-full cursor-pointer accent-blue-600"
                     />
                     <span className="text-sm text-gray-600">
-                        {localFilters.minRating > 0
-                            ? `${localFilters.minRating}★+`
-                            : "Any"}
+                        {localFilters.minRating > 0 ? `${localFilters.minRating}★+` : "Any"}
                     </span>
                 </div>
             </FilterSection>
@@ -111,9 +121,7 @@ const FilterOptions = ({ filters, onFilterChange, interestOptions = [] }) => {
             <FilterSection
                 title="Interests"
                 isOpen={expanded.interests}
-                toggle={() =>
-                    setExpanded((prev) => ({ ...prev, interests: !prev.interests }))
-                }
+                toggle={() => setExpanded((prev) => ({ ...prev, interests: !prev.interests }))}
             >
                 <PillGroup
                     options={availableInterests}
@@ -125,9 +133,7 @@ const FilterOptions = ({ filters, onFilterChange, interestOptions = [] }) => {
             <FilterSection
                 title="Season"
                 isOpen={expanded.seasons}
-                toggle={() =>
-                    setExpanded((prev) => ({ ...prev, seasons: !prev.seasons }))
-                }
+                toggle={() => setExpanded((prev) => ({ ...prev, seasons: !prev.seasons }))}
             >
                 <PillGroup
                     options={SEASON_OPTIONS}
@@ -139,32 +145,32 @@ const FilterOptions = ({ filters, onFilterChange, interestOptions = [] }) => {
     );
 };
 
-// **Reusable Components**
+// Reusable Components
 
 const FilterSection = ({ title, isOpen, toggle, children }) => (
-    <div className="mb-4">
+    <div className="mb-5">
         <div
-            className="flex justify-between items-center cursor-pointer pb-2 border-b"
+            className="flex justify-between items-center cursor-pointer pb-2 border-b text-gray-700"
             onClick={toggle}
         >
             <h4 className="text-md font-semibold">{title}</h4>
-            <span className="text-gray-500">{isOpen ? "−" : "+"}</span>
+            <span className="text-gray-500 text-xl font-light">{isOpen ? "−" : "+"}</span>
         </div>
-        {isOpen && <div className="mt-2">{children}</div>}
+        {isOpen && <div className="mt-3">{children}</div>}
     </div>
 );
 
 const CheckboxGroup = ({ options, selected, toggle }) => (
     <div className="grid gap-2">
         {options.map(({ id, label }) => (
-            <label key={id} className="flex items-center gap-2">
+            <label key={id} className="flex items-center gap-2 text-sm text-gray-800">
                 <input
                     type="checkbox"
                     checked={selected.includes(id)}
                     onChange={() => toggle(id)}
                     className="h-4 w-4 text-blue-500"
                 />
-                <span>{label}</span>
+                {label}
             </label>
         ))}
     </div>
@@ -175,14 +181,14 @@ const PillGroup = ({ options, selected, toggle }) => (
         {options.map(({ id, label, icon }) => (
             <div
                 key={id}
-                className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer ${selected.includes(id)
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                className={`flex items-center gap-2 p-2 px-3 rounded-xl cursor-pointer border transition ${selected.includes(id)
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
                     }`}
                 onClick={() => toggle(id)}
             >
-                {icon && <span>{icon}</span>}
-                <span>{label}</span>
+                {icon && <span className="text-lg">{icon}</span>}
+                <span className="text-sm font-medium">{label}</span>
             </div>
         ))}
     </div>

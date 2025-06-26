@@ -9,7 +9,7 @@ const ForgotPassword = ({ email }) => { // <-- Correctly destructure email
 
     const handleSendOTP = async () => {
         try {
-            await axios.post("http://localhost:3000/api/auth/forgot-password", { email }); // Now email is a string
+            await axios.post("https://destination-platform.onrender.com/api/auth/forgot-password", { email }); // Now email is a string
             toast.success("OTP sent to your email");
             setStep(2); // Move to next step
         } catch (error) {
@@ -19,7 +19,7 @@ const ForgotPassword = ({ email }) => { // <-- Correctly destructure email
 
     const handleVerifyOTP = async () => {
         try {
-            await axios.post("http://localhost:3000/api/auth/verify-otp", { email, otp });
+            await axios.post("https://destination-platform.onrender.com/verify-otp", { email, otp });
             toast.success("OTP verified. Set a new password.");
             setStep(3); // Move to next step
         } catch (error) {
@@ -29,7 +29,7 @@ const ForgotPassword = ({ email }) => { // <-- Correctly destructure email
 
     const handleResetPassword = async () => {
         try {
-            await axios.post("http://localhost:3000/api/auth/reset-password", { email, newPassword, otp });
+            await axios.post("https://destination-platform.onrender.com/api/auth/reset-password", { email, newPassword, otp });
             toast.success("Password reset successfully. Please login.");
         } catch (error) {
             toast.error(error.response?.data?.message || "Error resetting password");

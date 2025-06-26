@@ -1,3 +1,7 @@
 .main-content{
   background-color: rgb(255, 246, 127);
 }
+
+html {
+  transition: background-color 0.3s, color 0.3s;
+}

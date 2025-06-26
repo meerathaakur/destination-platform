@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RecommendationList from '../RecommendationList.jsx';
 import FilterOptions from '../FilterOptions.jsx';
@@ -8,8 +8,9 @@ import LoadingSpinner from '../LoadingSpinner.jsx';
 
 const RecommendationsPage = () => {
     const navigate = useNavigate();
+
     const preferences = usePreferenceStore((state) => state.preferences);
-    const { recommendations, loading, error, fetchRecommendations } = useRecommendationStore((state) => state);
+    const { recommendations, loading, error, fetchRecommendations } = useRecommendationStore();
 
     const [filters, setFilters] = useState({
         minRating: 0,
@@ -20,41 +21,43 @@ const RecommendationsPage = () => {
 
     const [filteredRecommendations, setFilteredRecommendations] = useState([]);
 
+    // Redirect to survey if preferences are empty
     useEffect(() => {
-        if (!preferences?.interests?.length) {
+        if (!preferences || !preferences.interests || preferences.interests.length === 0) {
             navigate('/survey');
-            return;
+        } else {
+            fetchRecommendations(preferences);
         }
-        fetchRecommendations(preferences);
-    }, [preferences, fetchRecommendations, navigate]);
+    }, [preferences, navigate, fetchRecommendations]);
 
-    const applyFilters = useCallback(() => {
-        let filtered = [...recommendations];
-
-        if (filters.minRating > 0) {
-            filtered = filtered.filter(item => item.rating >= filters.minRating);
-        }
-
-        if (filters.budget.length > 0) {
-            filtered = filtered.filter(item => filters.budget.includes(item.budget));
-        }
-
-        if (filters.interests.length > 0) {
-            filtered = filtered.filter(item =>
-                filters.interests.some(interest => item.interests.includes(interest))
-            );
-        }
-
-        if (filters.seasons.length > 0) {
-            filtered = filtered.filter(item => filters.seasons.includes(item.bestSeason));
-        }
-
-        setFilteredRecommendations(filtered);
-    }, [filters, recommendations]);
-
+    // Apply filters when either recommendations or filters change
     useEffect(() => {
+        const applyFilters = () => {
+            let filtered = [...recommendations];
+
+            if (filters.minRating > 0) {
+                filtered = filtered.filter(item => item.rating >= filters.minRating);
+            }
+
+            if (filters.budget.length > 0) {
+                filtered = filtered.filter(item => filters.budget.includes(item.budget));
+            }
+
+            if (filters.interests.length > 0) {
+                filtered = filtered.filter(item =>
+                    filters.interests.some(interest => item.interests.includes(interest))
+                );
+            }
+
+            if (filters.seasons.length > 0) {
+                filtered = filtered.filter(item => filters.seasons.includes(item.bestSeason));
+            }
+
+            setFilteredRecommendations(filtered);
+        };
+
         applyFilters();
-    }, [recommendations, filters, applyFilters]);
+    }, [recommendations, filters]);
 
     const handleFilterChange = (newFilters) => {
         setFilters(newFilters);
@@ -64,6 +67,7 @@ const RecommendationsPage = () => {
         navigate('/compare');
     };
 
+    // Loading state
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen text-center p-6">
@@ -74,13 +78,17 @@ const RecommendationsPage = () => {
         );
     }
 
+    // Error state
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen text-center p-6">
                 <h2 className="text-2xl font-semibold text-red-600">Oops! Something went wrong</h2>
                 <p className="text-gray-500 mt-2">{error}</p>
                 <button
-                    onClick={() => fetchRecommendations(preferences)}
+                    onClick={() => {
+                        fetchRecommendations(preferences)
+                        console.log(preferences)
+                    }}
                     className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
                 >
                     Try Again
@@ -102,7 +110,7 @@ const RecommendationsPage = () => {
                     <FilterOptions
                         filters={filters}
                         onFilterChange={handleFilterChange}
-                        interestOptions={preferences.interests}
+                        interestOptions={preferences.interests.interests}
                     />
                     <button
                         className="w-full mt-4 py-2 px-4 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 transition"
@@ -113,7 +121,7 @@ const RecommendationsPage = () => {
                 </aside>
 
                 {/* Main Recommendations Section */}
-                <main className="w-full md:w-2/3">
+                <main className="w-full md:w-2/3 ">
                     {filteredRecommendations.length > 0 ? (
                         <RecommendationList recommendations={filteredRecommendations} />
                     ) : (

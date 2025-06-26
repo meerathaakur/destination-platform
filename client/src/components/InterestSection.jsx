@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const INTEREST_OPTIONS = [
     { id: "adventure", label: "Adventure", icon: "🧗‍♂️" },
@@ -30,20 +30,21 @@ const ACTIVITY_OPTIONS = [
     { id: "boating", label: "Boating & Water Sports", icon: "🚤" },
 ];
 
-const InterestsSection = ({ data, updateData, onNext }) => {
+const InterestsSection = ({ data = {}, updateData, onNext }) => {
     const [selectedInterests, setSelectedInterests] = useState(data.interests || []);
     const [selectedActivities, setSelectedActivities] = useState(data.activities || []);
 
-    const toggleInterest = (interestId) => {
-        setSelectedInterests((prev) =>
-            prev.includes(interestId) ? prev.filter((id) => id !== interestId) : [...prev, interestId]
-        );
-    };
+    useEffect(() => {
+        setSelectedInterests(data.interests || []);
+        setSelectedActivities(data.activities || []);
+    }, [data]);
 
-    const toggleActivity = (activityId) => {
-        setSelectedActivities((prev) =>
-            prev.includes(activityId) ? prev.filter((id) => id !== activityId) : [...prev, activityId]
-        );
+    const toggleSelection = (id, setFunction, currentState) => {
+        if (currentState.includes(id)) {
+            setFunction(currentState.filter((item) => item !== id));
+        } else {
+            setFunction([...currentState, id]);
+        }
     };
 
     const handleNext = () => {
@@ -52,24 +53,25 @@ const InterestsSection = ({ data, updateData, onNext }) => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+        <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg">
             <h2 className="text-2xl font-bold text-center text-gray-800">🌍 What are you interested in?</h2>
             <p className="text-gray-500 text-center mt-2">Select all that apply</p>
 
             {/* Travel Interests */}
             <h3 className="text-lg font-semibold mt-6 text-gray-700">✈️ Travel Interests</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
-                {INTEREST_OPTIONS.map((interest) => (
+                {INTEREST_OPTIONS.map((item) => (
                     <button
-                        key={interest.id}
-                        className={`flex flex-col items-center p-4 border rounded-lg transition-all duration-200 ${selectedInterests.includes(interest.id)
+                        key={item.id}
+                        type="button"
+                        onClick={() => toggleSelection(item.id, setSelectedInterests, selectedInterests)}
+                        className={`flex flex-col items-center p-4 border rounded-lg transition-all duration-200 ${selectedInterests.includes(item.id)
                                 ? "bg-blue-600 text-white"
                                 : "border-gray-300 hover:bg-gray-100"
                             }`}
-                        onClick={() => toggleInterest(interest.id)}
                     >
-                        <span className="text-2xl">{interest.icon}</span>
-                        <span className="text-sm mt-2">{interest.label}</span>
+                        <span className="text-2xl">{item.icon}</span>
+                        <span className="text-sm mt-2">{item.label}</span>
                     </button>
                 ))}
             </div>
@@ -77,22 +79,23 @@ const InterestsSection = ({ data, updateData, onNext }) => {
             {/* Activities */}
             <h3 className="text-lg font-semibold mt-6 text-gray-700">🎯 Preferred Activities</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-4">
-                {ACTIVITY_OPTIONS.map((activity) => (
+                {ACTIVITY_OPTIONS.map((item) => (
                     <button
-                        key={activity.id}
-                        className={`flex flex-col items-center p-4 border rounded-lg transition-all duration-200 ${selectedActivities.includes(activity.id)
+                        key={item.id}
+                        type="button"
+                        onClick={() => toggleSelection(item.id, setSelectedActivities, selectedActivities)}
+                        className={`flex flex-col items-center p-4 border rounded-lg transition-all duration-200 ${selectedActivities.includes(item.id)
                                 ? "bg-green-500 text-white"
                                 : "border-gray-300 hover:bg-gray-100"
                             }`}
-                        onClick={() => toggleActivity(activity.id)}
                     >
-                        <span className="text-2xl">{activity.icon}</span>
-                        <span className="text-sm mt-2">{activity.label}</span>
+                        <span className="text-2xl">{item.icon}</span>
+                        <span className="text-sm mt-2">{item.label}</span>
                     </button>
                 ))}
             </div>
 
-            {/* Navigation Button */}
+            {/* Navigation */}
             <div className="mt-6 text-center">
                 <button
                     className="px-6 py-2 rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 transition-all"
