@@ -2,13 +2,13 @@ import { Router } from "express";
 import {
     getAllReviews,
     getReviewById,
-    createReview,
-    updateReview,
-    deleteReview,
     getReviewsByDestination,
     getReviewsByHotel,
-} from "../controllers/reviewController.js";
-import { auth } from "../middleware/auth.js";
+    createReview,
+    updateReview,
+    deleteReview
+} from "../controllers/review.controller.js";
+import { AuthenticationMW } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -19,8 +19,8 @@ router.get("/destination/:destinationId", getReviewsByDestination);
 router.get("/hotel/:hotelId", getReviewsByHotel);
 
 // Protected routes (Only authenticated users can create/update/delete reviews)
-router.post("/", auth, createReview);
-router.put("/:id", auth, updateReview);
-router.delete("/:id", auth, deleteReview);
+router.post("/", AuthenticationMW, createReview);
+router.put("/:id", AuthenticationMW, updateReview);
+router.delete("/:id", AuthenticationMW, deleteReview);
 
 export default router;

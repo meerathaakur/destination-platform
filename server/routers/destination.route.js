@@ -1,8 +1,16 @@
 import { Router } from 'express';
 const router = Router();
-import { getAllDestinations, searchDestinations, getDestinationById, getRecommendations, compareDestinations, createDestination, updateDestination, deleteDestination } from '../controllers/destinationController';
-import { auth, adminAuth } from '../middleware/auth';
-import { validateRequest } from '../middleware/validation';
+import {
+    getAllDestinations,
+    searchDestinations,
+    getDestinationById,
+    getRecommendations,
+    compareDestinations,
+    createDestination,
+    updateDestination,
+    deleteDestination
+} from '../controllers/destination.controller.js';
+import { AuthenticationMW, authorizeRole } from '../middlewares/auth.middleware.js';
 
 // Public routes
 router.get('/', getAllDestinations);
@@ -12,8 +20,8 @@ router.post('/recommendations', getRecommendations);
 router.post('/compare', compareDestinations);
 
 // Protected routes (admin only)
-router.post('/', [auth, adminAuth], createDestination);
-router.put('/:id', [auth, adminAuth], updateDestination);
-router.delete('/:id', [auth, adminAuth], deleteDestination);
+router.post('/', [AuthenticationMW, authorizeRole("admin", "superadmin")], createDestination);
+router.put('/:id', [AuthenticationMW, authorizeRole("admin", "superadmin")], updateDestination);
+router.delete('/:id', [AuthenticationMW, authorizeRole("admin", "superadmin")], deleteDestination);
 
 export default router;

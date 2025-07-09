@@ -1,3 +1,5 @@
+import User from "../models/user.model.js";
+
 export async function updateUserRole(req, res) {
     const { userId, role } = req.body;
 
@@ -7,8 +9,13 @@ export async function updateUserRole(req, res) {
 
     try {
         let user = await User.findById(userId);
+        // console.log(user)
         if (!user) {
             return res.status(404).json({ success: false, error: "User not found" });
+        }
+        console.log(`Role updated: ${user.email} (${user._id}) -> ${role} by ${req.user.email}`);
+        if (req.user.id === userId) {
+            return res.status(403).json({ success: false, error: "You cannot change your own role" });
         }
 
         // Only superadmins can assign 'superadmin' role

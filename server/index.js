@@ -12,12 +12,12 @@ import { v2 as cloudinary } from "cloudinary";
 import userModel from "./models/user.model.js";
 
 // Import Routes (Uncomment when routes are available)
-import authRouter from "./routers/auth.route.js"
-// import userRoutes from "./routes/userRoutes.js";
-// import destinationRoutes from "./routes/destinationRoutes.js";
-// import reviewRoutes from "./routes/reviewRoutes.js";
-// import itineraryRoutes from "./routes/itineraryRoutes.js";
-// import surveyRoutes from "./routes/surveyRoutes.js";
+import authRouter from "./routers/auth.route.js";
+import userRoutes from "./routers/user.router.js";
+import destinationRoutes from "./routers/destination.route.js";
+import reviewRoutes from "./routers/review.routes.js";
+import itineraryRoutes from "./routers/itinerary.routes.js";
+import surveyRoutes from "./routers/survey.routes.js";
 
 // Import middleware
 import { AuthenticationMW } from "./middlewares/auth.middleware.js";
@@ -33,7 +33,7 @@ app.use(compression());
 app.use(morgan("dev"));
 // ✅ Configure CORS correctly
 app.use(cors({
-    origin: "https://destination-platform.vercel.app/",  // 🔹 Allow only your frontend
+    origin: ["https://destination-platform.vercel.app", "http://localhost:5173"],  // 🔹 Allow both frontend URLs
     credentials: true,                 // 🔹 Allow sending cookies (HttpOnly)
     methods: "GET,POST,PUT,DELETE",    // 🔹 Allowed request methods
     allowedHeaders: "Content-Type,Authorization" // 🔹 Allowed headers
@@ -41,12 +41,12 @@ app.use(cors({
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-// Routes Middleware (Uncomment when routes are available)
-// app.use("/api/users", userRoutes);
-// app.use("/api/destinations", destinationRoutes);
-// app.use("/api/reviews", reviewRoutes);
-// app.use("/api/itineraries", itineraryRoutes);
-// app.use("/api/survey", surveyRoutes);
+// Routes Middleware
+app.use("/api/users", userRoutes);
+app.use("/api/destinations", destinationRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/itineraries", itineraryRoutes);
+app.use("/api/survey", surveyRoutes);
 
 // Serve static assets in production
 // if (process.env.NODE_ENV === "production") {

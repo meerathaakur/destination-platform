@@ -1,5 +1,5 @@
 import "dotenv/config"
-import jwt from "jsonwebtoken"
+import jwt, { decode } from "jsonwebtoken"
 
 import { check } from "express-validator";
 const { verify } = jwt;
@@ -16,9 +16,9 @@ export function AuthenticationMW(req, res, next) {
         if (err) {
             return res.status(403).json({ message: "Invalid or expired token. Please log in again." });
         }
-        console.log("printing decodedfrom Authentication middleware")
-        console.log(decoded)
+        // Token decoded successfully
         req.user = decoded
+        console.log(decode)
         next()
     })
 }
@@ -31,37 +31,14 @@ export const validateRegister = [
 ];
 
 
-
-// export function AuthenticationMW(req, res, next) {
-//     const token = req.headers.authorization?.split(" ")[1];
-
-//     if (!token) {
-//         return res.status(401).json({ message: "Access Denied! No Token Provided" });
-//     }
-
-//     jwt.verify(token, "secret-key", (err, decoded) => {
-//         if (err) {
-//             return res.status(403).json({ message: "Invalid Token" });
-//         } else {
-//             console.log("Decoded User:", decoded);
-//             req.user = decoded; // Store user info in request
-//             next();
-//         }
-//     });
-// }
-
-// Middleware to check if the user is an admin
-export function isAdmin(req, res, next) {
-    if (req.user.role !== "admin" && req.user.role !== "superadmin") {
-        return res.status(403).json({ message: "Access Denied! Admins only." });
-    }
-    next();
-}
-
-// Middleware to check if the user is a superadmin
-export function isSuperAdmin(req, res, next) {
-    if (req.user.role !== "superadmin") {
-        return res.status(403).json({ message: "Access Denied! Super Admins only." });
-    }
-    next();
+// Middleware to check role
+export function authorizeRole(...allowedRoles) {
+    
+    return (req, res, next) => {
+        console.log(allowedRoles,req.user)
+        if (!allowedRoles.includes(req.user?.role)) {
+            return res.status(403).json({ message: "Access Denied: Insufficient Permissions" });
+        }
+        next();
+    };
 }

@@ -23,23 +23,16 @@ const userSchema = new Schema(
       default: "user", // Default role is 'user'
     },
 
-    // savedDestinations: [
-    //   {
-    //     name: { type: String, required: true, trim: true },
-    //     country: { type: String, trim: true },
-    //     image: { type: String, default: "" },
-    //   },
-    // ],
+    savedDestinations: [{ type: Schema.Types.ObjectId, ref: "Destination" }],
 
     resetToken: { type: String, default: null },
 
-    // travelHistory: [
-    //   {
-    //     name: { type: String, required: true, trim: true },
-    //     country: { type: String, trim: true },
-    //     visitedDate: { type: Date, default: Date.now },
-    //   },
-    // ],
+    travelHistory: [
+      {
+        destination: { type: Schema.Types.ObjectId, ref: "Destination" },
+        visitedDate: { type: Date, default: Date.now },
+      },
+    ],
 
     preferences: {
       budget: { type: String, enum: ["low", "medium", "high"], default: "medium" },

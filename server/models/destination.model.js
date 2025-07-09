@@ -32,6 +32,7 @@ const destinationSchema = new Schema(
                     "Religious",
                     "Festival",
                     "Historical",
+                    "Lifestyle"
                 ],
             },
         ],

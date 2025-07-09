@@ -9,9 +9,9 @@ import { sendOTP } from "../config/mailer.config.js";
 
 
 // Function to generate JWT Token
-const generateToken = (userId) => {
-    return sign({ id: userId }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE,
+const generateToken = (user) => {
+    return sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE || "7d",
     });
 };
 
@@ -50,7 +50,7 @@ export async function register(req, res) {
 
         await user.save();
 
-        const token = generateToken(user._id); // ✅ use _id instead of id
+        const token = generateToken(user); // ✅ use _id instead of id
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production", // true for HTTPS in production
@@ -99,7 +99,7 @@ export async function login(req, res) {
             return res.status(401).json({ success: false, message: "Incorrect password." });
         }
 
-        const token = generateToken(user._id); // ✅ use _id for consistency
+        const token = generateToken(user); // ✅ use _id for consistency
 
         res.cookie("token", token, {
             httpOnly: true,
@@ -202,12 +202,18 @@ export async function forgotPassword(req, res) {
         }
         // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        console.log(email, otp)
         // console.log(otp)
         // Save OTP in database
         await OTPModel.create({ email, otp });
 
         // Send OTP via email
-        await sendOTP(email, otp);
+        try {
+            await sendOTP(email, otp);
+        } catch (emailError) {
+            console.error("Failed to send OTP email:", emailError);
+            return res.status(500).json({ success: false, error: "Failed to send OTP" });
+        }
 
         // In a real implementation, you would:
         // 1. Generate a reset token
@@ -229,6 +235,7 @@ export const verifyOTP = async (req, res) => {
     try {
         const otpRecord = await OTPModel.findOne({ email, otp });
         if (!otpRecord) return res.status(400).json({ message: "Invalid OTP or expired" });
+        await OTPModel.deleteOne({ email, otp }); // Delete OTP after verification
 
         res.json({ message: "OTP verified successfully" });
     } catch (error) {
@@ -257,4 +264,9 @@ export const resetPassword = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
     }
+};
+
+export const logout = (req, res) => {
+    res.clearCookie("token");
+    res.json({ success: true, message: "Logged out successfully" });
 };

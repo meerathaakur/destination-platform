@@ -9,45 +9,35 @@ import {
     resetPassword
 } from "../controllers/auth.controller.js";
 
-import { AuthenticationMW, isAdmin, isSuperAdmin } from "../middlewares/auth.middleware.js";
+import { AuthenticationMW, authorizeRole, validateRegister } from "../middlewares/auth.middleware.js";
 import { updateUserRole } from "../controllers/role.controller.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/register", register);
+// Public routes (no authentication required)
+authRouter.post("/register",validateRegister, register);
 authRouter.post("/login", login);
-authRouter.get("/me", getCurrentUser);
-authRouter.put("/updatepassword", AuthenticationMW, updatePassword);
-
 authRouter.post("/forgot-password", forgotPassword);
 authRouter.post("/verify-otp", verifyOTP);
 authRouter.post("/reset-password", resetPassword);
 
-// Admin-only route
-authRouter.get("/admin-dashboard", AuthenticationMW, isAdmin, (req, res) => {
-    res.json({ message: "Welcome to the Admin Dashboard!" });
-});
+// Protected routes (authentication required)
+authRouter.get("/me", AuthenticationMW, getCurrentUser);
+authRouter.put("/updatepassword", AuthenticationMW, updatePassword);
 
-// Superadmin-only route
-authRouter.get("/superadmin-dashboard", AuthenticationMW, isSuperAdmin, (req, res) => {
-    res.json({ message: "Welcome to the Super Admin Dashboard!" });
-});
-
-authRouter.put("/update-role", AuthenticationMW, isAdmin, updateUserRole);
-
-
-// Only authenticated users can access this
+// User dashboard (authenticated users only)
 authRouter.get("/user-dashboard", AuthenticationMW, (req, res) => {
     res.json({ message: "Welcome to the User Dashboard!" });
 });
 
-// Only admins can access this
-authRouter.get("/admin-dashboard", AuthenticationMW, isAdmin, (req, res) => {
+// Admin routes (admin access required)
+authRouter.get("/admin-dashboard", AuthenticationMW, authorizeRole("admin", "superadmin"), (req, res) => {
     res.json({ message: "Welcome to the Admin Dashboard!" });
 });
+authRouter.put("/update-role", AuthenticationMW, authorizeRole("admin", "superadmin"), updateUserRole);
 
-// Only superadmins can access this
-authRouter.get("/superadmin-dashboard", AuthenticationMW, isSuperAdmin, (req, res) => {
+// Super admin routes (super admin access required)
+authRouter.get("/superadmin-dashboard", AuthenticationMW, authorizeRole("superadmin"), (req, res) => {
     res.json({ message: "Welcome to the Super Admin Dashboard!" });
 });
 export default authRouter;
