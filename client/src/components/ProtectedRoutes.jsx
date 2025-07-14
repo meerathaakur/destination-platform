@@ -3,34 +3,39 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         const checkAuth = async () => {
             try {
+                setLoading(true);
                 const res = await fetch("https://destination-platform.onrender.com/api/auth/me", {
                     method: "GET",
-                    credentials: "include"
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
                 });
 
-                if (!res.ok) {
-                    navigate("/login");
+                if (res.ok) {
+                    setIsAuthenticated(true);
                 } else {
-                    setLoading(false);
+                    navigate("/login");
                 }
             } catch (err) {
+                console.error("Auth check failed:", err);
                 navigate("/login");
-                console.log(err)
+            } finally {
+                setLoading(false);
             }
         };
 
         checkAuth();
-    }, [navigate]);
+    }, []);
 
     if (loading) return <div className="text-center py-10 text-xl">Loading...</div>;
 
-    return children;
+    return isAuthenticated ? children : null;
 };
 
 export default ProtectedRoute;

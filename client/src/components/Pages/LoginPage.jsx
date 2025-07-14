@@ -1,54 +1,35 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ForgotPassword from "../ForgotPassword";
-import SignupPage from "./SignUpPage";
+import { useAuth } from "../context/AuthContext"; // Adjust path
+// import ForgotPassword from "../ForgotPassword"; // Uncomment when used
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const { user, login, loading } = useAuth();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
+    // Redirect if already logged in
     useEffect(() => {
-        const checkLoggedIn = async () => {
-            try {
-                const res = await fetch("https://destination-platform.onrender.com/api/auth/me", {
-                    method: "GET",
-                    credentials: "include",
-                });
-                if (res.ok) navigate("/");
-            } catch(error) {
-                setError("Something went wrong",error.message)
-            }
-        };
-        checkLoggedIn();
-    }, [navigate]);
+        if (!loading && user) {
+            navigate("/");
+        }
+    }, [user, loading, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
-        setLoading(true);
+        setSubmitting(true);
 
         try {
-            const res = await fetch("https://destination-platform.onrender.com/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ email, password }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setError(data.message || "Invalid email or password.");
-            } else {
-                navigate("/");
-            }
+            await login(email, password);
         } catch (err) {
-            setError("Something went wrong. Please try again.",err.message);
+            setError(err.message || "Login failed. Please try again.");
         } finally {
-            setLoading(false);
+            setSubmitting(false);
         }
     };
 
@@ -92,9 +73,7 @@ const LoginPage = () => {
                             <label htmlFor="password" className="block text-sm font-medium text-gray-900">
                                 Password
                             </label>
-                            <div className="text-sm">
-                                <ForgotPassword key={email} email={email} />
-                            </div>
+                            {/* <ForgotPassword key={email} email={email} /> */}
                         </div>
                         <div className="mt-2">
                             <input
@@ -113,16 +92,16 @@ const LoginPage = () => {
                     <div>
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={submitting}
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                         >
-                            {loading ? "Signing in..." : "Sign in"}
+                            {submitting ? "Signing in..." : "Sign in"}
                         </button>
                     </div>
                 </form>
 
                 <p className="mt-6 text-center text-sm text-gray-500">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <span
                         className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer"
                         onClick={() => navigate("/register")}

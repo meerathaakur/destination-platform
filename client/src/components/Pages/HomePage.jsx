@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from "react";
+// import { useEffect } from "react";
+// import { useAuth } from "../context/AuthContext"; // adjust path as needed
 import FeatureCard from '../FeatureCard';
 
 const features = [
@@ -17,33 +18,17 @@ const DESTINATION = [
 
 const HomePage = () => {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
+    // const { user, loading } = useAuth();
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const res = await fetch("https://destination-platform.onrender.com/api/auth/me", {
-                    method: "GET",
-                    credentials: "include",
-                });
-                console.log(res)
-                if (!res.ok) {
-                    navigate("/login");
-                    return;
-                }
+    // useEffect(() => {
+    //     if (!loading && !user) {
+    //         navigate("/login");
+    //     }
+    // }, [user, loading, navigate]);
 
-                setLoading(false); 
-            } catch (e) {
-                console.log("Auth check failed:", e);
-                navigate("/login");
-            }
-        };
-        checkAuth();
-    }, [navigate]);
-
-    if (loading) {
-        return <div className="h-screen flex items-center justify-center text-xl">Loading...</div>;
-    }
+    // if (loading) {
+    //     return <div className="h-screen flex items-center justify-center text-xl">Loading...</div>;
+    // }
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -74,7 +59,7 @@ const HomePage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
                     {DESTINATION.map((destination, index) => (
                         <div key={index} className="p-6 bg-white dark:bg-gray-700 rounded-lg shadow-md text-center">
-                            <div className="h-40 bg-gray-300 dark:bg-gray-600 rounded-md mb-4">
+                            <div className="h-40 bg-gray-300 dark:bg-gray-600 rounded-md mb-4 overflow-hidden">
                                 <img src={destination.image} alt={destination.name} className="w-full h-full object-cover rounded-md" />
                             </div>
                             <h3 className="text-lg font-semibold">{destination.name}</h3>

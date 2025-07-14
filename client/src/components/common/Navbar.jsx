@@ -8,23 +8,10 @@ import {
     MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-// import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // ✅ Fixed import
-import { Sun, Moon } from 'lucide-react';
+import { Link, useLocation } from "react-router-dom";
+import { Sun, Moon } from "lucide-react";
 import { useTheme } from "../context/ThemeProvider";
-
-const navigation = [
-    { name: "Dashboard", href: "/", current: false },
-    { name: "Traverels", href: "/travelers", current: false },
-    { name: "Projects", href: "/projects", current: false },
-    { name: "Calendar", href: "/calendar", current: false },
-];
-
-const userNavigation = [
-    { name: "Your Profile", href: "/profile" },
-    { name: "Settings", href: "/settings" },
-    { name: "Sign out", href: "/logout" },
-];
+import { useAuth } from "../context/AuthContext";
 
 const LOGO =
     "https://res.cloudinary.com/dagmoqwr5/image/upload/v1742725706/logo-removebg-preview-removebg-preview_rbuupm.png";
@@ -35,14 +22,22 @@ function classNames(...classes) {
 
 const Navbar = () => {
     const { darkMode, setDarkMode } = useTheme();
-    
+    const { user, logout } = useAuth();
+    const location = useLocation();
+
+    const navigation = [
+        { name: "Dashboard", href: "/" },
+        { name: "Travelers", href: "/travelers" },
+        { name: "Projects", href: "/projects" },
+        { name: "Calendar", href: "/calendar" },
+    ];
 
     const toggleDarkMode = () => {
         setDarkMode(!darkMode);
     };
 
     return (
-        <Disclosure as="nav" className="bg-gray-800 sticky top-0">
+        <Disclosure as="nav" className="bg-gray-800 sticky top-0 z-50">
             {({ open }) => (
                 <>
                     <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -63,23 +58,26 @@ const Navbar = () => {
                                 <div className="flex shrink-0 items-center">
                                     <img className="h-10 w-auto" src={LOGO} alt="Company Logo" />
                                 </div>
-                                <h1 className="text-white font-bold text-xl">Wonderlust</h1>
+                                <h1 className="ml-2 text-white font-bold text-xl">Wonderlust</h1>
                                 <div className="hidden sm:ml-6 sm:block">
                                     <div className="flex space-x-4">
-                                        {navigation.map((item) => (
-                                            <Link
-                                                key={item.name}
-                                                to={item.href}
-                                                className={classNames(
-                                                    item.current
-                                                        ? "bg-gray-900 text-white"
-                                                        : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                                    "rounded-md px-3 py-2 text-sm font-medium"
-                                                )}
-                                            >
-                                                {item.name}
-                                            </Link>
-                                        ))}
+                                        {navigation.map((item) => {
+                                            const isActive = location.pathname === item.href;
+                                            return (
+                                                <Link
+                                                    key={item.name}
+                                                    to={item.href}
+                                                    className={classNames(
+                                                        isActive
+                                                            ? "bg-gray-900 text-white"
+                                                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                                        "rounded-md px-3 py-2 text-sm font-medium"
+                                                    )}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
@@ -100,21 +98,45 @@ const Navbar = () => {
                                         />
                                     </MenuButton>
                                     <MenuItems className="absolute right-0 z-10 mt-2 w-48 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
-                                        {userNavigation.map((item) => (
-                                            <MenuItem key={item.name}>
-                                                {({ active }) => (
-                                                    <Link
-                                                        to={item.href}
-                                                        className={classNames(
-                                                            active ? "bg-gray-100" : "",
-                                                            "block px-4 py-2 text-sm text-gray-700"
-                                                        )}
-                                                    >
-                                                        {item.name}
-                                                    </Link>
-                                                )}
-                                            </MenuItem>
-                                        ))}
+                                        <MenuItem>
+                                            {({ active }) => (
+                                                <Link
+                                                    to="/profile"
+                                                    className={classNames(
+                                                        active ? "bg-gray-100" : "",
+                                                        "block px-4 py-2 text-sm text-gray-700"
+                                                    )}
+                                                >
+                                                    Your Profile
+                                                </Link>
+                                            )}
+                                        </MenuItem>
+                                        <MenuItem>
+                                            {({ active }) => (
+                                                <Link
+                                                    to="/settings"
+                                                    className={classNames(
+                                                        active ? "bg-gray-100" : "",
+                                                        "block px-4 py-2 text-sm text-gray-700"
+                                                    )}
+                                                >
+                                                    Settings
+                                                </Link>
+                                            )}
+                                        </MenuItem>
+                                        <MenuItem>
+                                            {({ active }) => (
+                                                <button
+                                                    onClick={logout}
+                                                    className={classNames(
+                                                        active ? "bg-gray-100" : "",
+                                                        "w-full text-left block px-4 py-2 text-sm text-gray-700"
+                                                    )}
+                                                >
+                                                    Sign out
+                                                </button>
+                                            )}
+                                        </MenuItem>
                                     </MenuItems>
                                 </Menu>
 
@@ -136,21 +158,24 @@ const Navbar = () => {
                     {/* Mobile Menu Items */}
                     <DisclosurePanel className="sm:hidden">
                         <div className="space-y-1 px-2 pb-3 pt-2">
-                            {navigation.map((item) => (
-                                <DisclosureButton
-                                    key={item.name}
-                                    as={Link}
-                                    to={item.href}
-                                    className={classNames(
-                                        item.current
-                                            ? "bg-gray-900 text-white"
-                                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                        "block rounded-md px-3 py-2 text-base font-medium"
-                                    )}
-                                >
-                                    {item.name}
-                                </DisclosureButton>
-                            ))}
+                            {navigation.map((item) => {
+                                const isActive = location.pathname === item.href;
+                                return (
+                                    <DisclosureButton
+                                        key={item.name}
+                                        as={Link}
+                                        to={item.href}
+                                        className={classNames(
+                                            isActive
+                                                ? "bg-gray-900 text-white"
+                                                : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                            "block rounded-md px-3 py-2 text-base font-medium"
+                                        )}
+                                    >
+                                        {item.name}
+                                    </DisclosureButton>
+                                );
+                            })}
                         </div>
                     </DisclosurePanel>
                 </>

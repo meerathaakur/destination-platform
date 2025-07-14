@@ -8,7 +8,7 @@ const AuthContext = createContext();
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
+        throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;
 };
@@ -16,82 +16,59 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [shouldNavigate, setShouldNavigate] = useState(false);
-    const [navigationPath, setNavigationPath] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
-        const loadUser = async () => {
+        const fetchUser = async () => {
             try {
                 const res = await fetch(`${URL}/auth/me`, {
                     method: "GET",
-                    credentials: "include",
+                    credentials: "include", // crucial for cookie-based auth
                     headers: { "Content-Type": "application/json" },
                 });
-                if (!res.ok) throw new Error("Unauthorized");
 
+                if (!res.ok) throw new Error("Unauthorized");
                 const data = await res.json();
+
                 setUser(data.user);
-                localStorage.setItem("user", JSON.stringify(data.user));
             } catch {
                 setUser(null);
-                localStorage.removeItem("user");
             } finally {
                 setLoading(false);
             }
         };
-        loadUser();
+
+        fetchUser();
     }, []);
 
-    useEffect(() => {
-        if (shouldNavigate && navigationPath) {
-            navigate(navigationPath);
-            setShouldNavigate(false);
-            setNavigationPath("");
-        }
-    }, [shouldNavigate, navigationPath, navigate]);
-
     const login = async (email, password) => {
-        try {
-            const res = await fetch(`${URL}/auth/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ email, password }),
-            });
+        const res = await fetch(`${URL}/auth/login`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+        });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || "Login failed");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Login failed");
 
-            setUser(data.user);
-            localStorage.setItem("user", JSON.stringify(data.user));
-
-            setNavigationPath("/dashboard");
-            setShouldNavigate(true);
-        } catch (error) {
-            throw new Error(error.message || "Login failed");
-        }
+        setUser(data.user);
+        navigate("/");
     };
 
-    const register = async (username, email, password) => {
-        try {
-            const res = await fetch(`${URL}/auth/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ name: username, email, password }),
-            });
+    const register = async (name, email, password, phone) => {
+        const res = await fetch(`${URL}/auth/register`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password, phone }),
+        });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || "Registration failed");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Registration failed");
 
-            setUser(data.user);
-            localStorage.setItem("user", JSON.stringify(data.user));
-            setNavigationPath("/dashboard");
-            setShouldNavigate(true);
-        } catch (error) {
-            throw new Error(error.message || "Registration failed");
-        }
+        setUser(data.user);
+        navigate("/");
     };
 
     const logout = async () => {
@@ -100,13 +77,11 @@ export const AuthProvider = ({ children }) => {
                 method: "POST",
                 credentials: "include",
             });
-        } catch(error) {
-            throw new Error(error.message);
+        } catch (err) {
+            console.error("Logout failed", err);
         }
         setUser(null);
-        localStorage.removeItem("user");
-        setNavigationPath("/login");
-        setShouldNavigate(true);
+        navigate("/login");
     };
 
     return (

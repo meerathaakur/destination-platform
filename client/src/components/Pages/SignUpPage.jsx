@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const SignupPage = () => {
-    const navigate = useNavigate();
+    const { register } = useAuth();
+    // State to manage user input and feedback
     const [user, setUser] = useState({
         name: "",
         email: "",
@@ -22,21 +23,9 @@ const SignupPage = () => {
         setSuccess("");
 
         try {
-            const response = await fetch("https://destination-platform.onrender.com/api/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(user),
-            });
- 
-            const data = await response.json();
+            await register(user.name, user.email, user.password,user.phone);
+            setSuccess("Account created successfully! Redirecting to login...");
 
-            if (response.ok) {
-                setSuccess("Account created successfully! Redirecting to login...");
-                localStorage.setItem("token", data.token);
-                setTimeout(() => navigate("/"), 2000); // Redirect to login page after 2 seconds
-            } else {
-                setError(data.message || "Signup failed. Try again.");
-            }
         } catch (error) {
             setError("Something went wrong. Please try again.");
             console.error("Signup error:", error);
@@ -115,7 +104,7 @@ const SignupPage = () => {
                     </div>
                 </form>
 
-                <p className="mt-4 text-center text-sm text-gray-500">
+                {/* <p className="mt-4 text-center text-sm text-gray-500">
                     Already have an account?{" "}
                     <span
                         className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer"
@@ -123,7 +112,7 @@ const SignupPage = () => {
                     >
                         Login
                     </span>
-                </p>
+                </p> */}
             </div>
         </div>
     );
